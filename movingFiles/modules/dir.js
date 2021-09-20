@@ -1,7 +1,5 @@
-const { resolve } = require("path");
 const { existsSync } = require("fs");
 const { mkdir, readdir, unlink } = require("fs/promises");
-const { filesToGzip } = require("./gzip");
 
 const createDir = async (path) => {
     if (!existsSync(path)) {
@@ -21,11 +19,4 @@ const removeFiles = async (files) => {
     console.log("Files have been deleted");
 }
 
-const moveFiles = async (inputPath, outputPath, files) => {
-    await createDir(outputPath);
-    await filesToGzip(inputPath, outputPath, files);
-    const absoluteFileNames = files.map(file => resolve(inputPath, file));
-    await removeFiles(absoluteFileNames);
-}
-
-module.exports = {createDir, readDir, removeFiles, moveFiles}
+module.exports = { createDir, readDir, removeFiles }
