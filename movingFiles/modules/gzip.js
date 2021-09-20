@@ -3,7 +3,7 @@ const { createReadStream, createWriteStream } = require("fs");
 const zlib = require("zlib");
 const path = require("path");
 
-const createGzip = (inputPath, outputPath, file) => {
+const transformFile = (inputPath, outputPath, file) => {
     const readStream = createReadStream(path.join(inputPath, file));
     const writeStream = createWriteStream(path.join(outputPath, file + ".tar.gz"));
 
@@ -18,7 +18,7 @@ const createGzip = (inputPath, outputPath, file) => {
 
 const filesToGzip = async (inputPath, outputPath, files) => {
     await Promise.all(
-        files.map((file) => createGzip(inputPath, outputPath, file))
+        files.map((file) => transformFile(inputPath, outputPath, file))
     );
     console.log("Files have been zipped");
 }

@@ -4,7 +4,9 @@ const { mkdir, readdir, unlink } = require("fs/promises");
 const createDir = async (path) => {
     if (!existsSync(path)) {
         await mkdir(path);
-        console.log("Output directory has been created");
+        console.log(`"${path}" directory has been created`);
+    } else {
+        console.log(`"${path}" directory already exists`);
     }
 }
 
@@ -13,6 +15,9 @@ const readDir = (path) => {
 }
 
 const removeFiles = async (files) => {
+    if (!Array.isArray(files)) {
+        throw Error(`${typeof files} is not an array`);
+    }
     await Promise.all(
         files.map((file) => unlink(file))
     );
