@@ -1,32 +1,27 @@
+const path = require("path");
 const { existsSync } = require("fs");
-const { mkdir, readdir } = require("fs/promises");
-const createGzip = require("./modules/gzip");
+const { readDir, moveFiles } = require("./modules/dir");
 
 const INPUT_PATH = process.env.INPUT_PATH || "input";
 const OUTPUT_PATH = process.env.OUTPUT_PATH || "output";
 
-const main = async () => {
+const main = async (inputPath, outputPath) => {
     try {
-        if (!existsSync(INPUT_PATH)) {
+        if (!existsSync(inputPath)) {
             console.log("Directory 'input' doesn't exist");
             return;
         }
 
-        if (!existsSync(OUTPUT_PATH)) {
-            await mkdir(OUTPUT_PATH);
-        }
-        
-        const files = await readdir(INPUT_PATH);
+        const files = await readDir(inputPath);
 
-        await Promise.all(
-            files.map((file) => createGzip(INPUT_PATH, OUTPUT_PATH, file))
-        );
-        
-        console.log("Finished");
+        if (files.length > 0) {
+            console.log("Files: ", files.join(", "));
+            await moveFiles(inputPath, outputPath, files);
+        }
     } catch (error) {
         console.log(error);
     }
 }
 
-main();
+main(INPUT_PATH, OUTPUT_PATH);
 
