@@ -6,12 +6,14 @@ class RemovingTransform extends stream.Transform {
     }
 
     _transform(chunk, encoding, callback) {
-        if (Buffer.isBuffer(chunk)) {
-            chunk = chunk.toString();
+        const isBuffer = Buffer.isBuffer(chunk);
+
+        chunk = chunk.toString().split("").filter((elem) => elem != "р" && elem !=  "Р").join("");
+
+        if (isBuffer) {
+            chunk = Buffer.from(chunk);
         }
-        
-        chunk = chunk.split("").filter((elem) => elem != "р" && elem !=  "Р").join("");
-        
+
         if (chunk.length > 0) {
             this.push(chunk);
         }
