@@ -1,4 +1,4 @@
-const { get } = require("./request");
+const { get, getStream } = require("./request");
 const { convertDate } = require("./date");
 const { Currency } = require("./currency");
 const { Rate } = require("./rate");
@@ -23,6 +23,10 @@ const getExchangeRates = async (id, startDate, endDate) => {
     return data.map(toRate);
 }
 
+const getExchangeRatesStream = async (id, startDate, endDate) => {
+    return getStream(`https://www.nbrb.by/api/exrates/rates/dynamics/${id}?startDate=${convertDate(startDate)}&endDate=${convertDate(endDate)}`);
+}
+
 const getCurrenciesOnDate = async (date) => {
     const ratesOnDate = await getRatesOnDate(date);
 
@@ -41,4 +45,4 @@ const toCurrency = (currency) => {
     return new Currency(currency.Cur_ID, currency.Cur_ParentID, currency.Cur_Code, currency.Cur_Abbreviation, startDate, endDate);
 }
 
-module.exports = { getAllCurrencies, getRatesOnDate, getCurrency, getExchangeRates, getCurrenciesOnDate }
+module.exports = { getAllCurrencies, getRatesOnDate, getCurrency, getExchangeRates, getCurrenciesOnDate, getExchangeRatesStream }

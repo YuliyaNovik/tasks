@@ -19,6 +19,15 @@ const get = (url) => {
     })
 }
 
-//const json = async (url) => await get(url).then(data => JSON.parse(data))
+const getStream = (url) => {
+    return new Promise((resolve, reject) => {
+        return https.get(url, (response) => {
+            resolve(response);
+        })
+        .on("error", (err) => {
+            reject(err);
+        });
+    });
+}
 
-module.exports = { get }
+module.exports = { get, getStream }
