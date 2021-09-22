@@ -2,27 +2,26 @@
 const { getExchangeRatesStream } = require("./nbrb");
 const { createWriteStream } = require("./writeStream");
 const { convertDate } = require("./date");
-const { pipeAfter } = require("./pipe");
+const { getActivityPeriods } = require("./activityPeriod");
+const { pipeEvery } = require("./pipe");
 
-const parseCurrencyActivePeriod = async (writeStream, currency, allCurrencies, startDate, endDate, source) => {
-    const ratesStream = await getExchangeRatesStream(currency.id, startDate, currency.endDate);
-    pipeAfter(source, ratesStream, writeStream);
-
-    if (currency.endDate >= endDate) {
-        return;
-    }
-
-    const nextCurrency = allCurrencies.find(item => item.parentId === currency.parentId && item.startDate > currency.endDate);
-    if (nextCurrency) {
-        setImmediate(() => parseCurrencyActivePeriod(writeStream, nextCurrency, allCurrencies, nextCurrency.startDate, endDate, ratesStream));
-    }
+const writeRatesForEachPeriod = async (writeStream, activityPeriods) => {
+    const ratesStreams = (await Promise.allSettled(
+            activityPeriods.map((period) => {
+                return getExchangeRatesStream(period.id, period.startDate, period.endDate)
+            })
+        ))
+        .filter((item) => item.status === "fulfilled")
+        .map((item) => item.value);
+    pipeEvery(ratesStreams, writeStream);
 }
 
 const writeExchangeRates = async (activeCurrencies, allCurrencies, startDate, endDate) => {
     const results = await Promise.allSettled(
         activeCurrencies.map(async (currency) => {
             const writeStream = createWriteStream(`${currency.abbreviation}_${convertDate(startDate)}-${convertDate(endDate)}.txt`);
-            return parseCurrencyActivePeriod(writeStream, currency, allCurrencies, startDate, endDate, null);
+            const activityPeriods = getActivityPeriods(currency, allCurrencies, startDate, endDate);
+            return writeRatesForEachPeriod(writeStream, activityPeriods);
         })
     );
 
