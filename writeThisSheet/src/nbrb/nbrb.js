@@ -1,7 +1,7 @@
-const { get, getStream } = require("./request");
+const { get, getStream } = require("../request/request");
 const { convertDate } = require("./date");
-const { Currency } = require("./currency");
-const { Rate } = require("./rate");
+const { Currency } = require("./models/currency");
+const { Rate } = require("./models/rate");
 
 const getCurrency = async (id) => {
     const data = await get(`https://www.nbrb.by/api/exrates/currencies/${id}`);

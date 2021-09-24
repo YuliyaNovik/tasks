@@ -1,10 +1,4 @@
-class ActivityPeriod {
-    constructor(id, startDate, endDate) {
-        this.id = id;
-        this.startDate = startDate;
-        this.endDate = endDate;
-    }
-}
+const { ActivityPeriod } = require("./models/activityPeriod");
 
 const getActivityPeriods = (currency, allCurrencies, startDate, endDate) => {
     let activityPeriods = allCurrencies
