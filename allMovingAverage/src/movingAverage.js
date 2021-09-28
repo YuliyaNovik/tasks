@@ -1,3 +1,5 @@
+const { convertDate } = require("./nbrb/date");
+
 const getMovingAverage = (ratesInterval, intervalLength) => {
     if (ratesInterval.length <= 0 || ratesInterval.length !== intervalLength) {
         throw Error("Lack of values");
@@ -14,7 +16,7 @@ const calculateMovingAverage = (rates, intervalLength) => {
             ratesInterval.splice(0, 1);
             ratesInterval.push(rate.officialRate);
             movingAverageRates.push({
-                date: rate.date,
+                date: convertDate(rate.date),
                 course: rate.officialRate,
                 movingAverageCourse: movingAverage
             })
