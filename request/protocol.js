@@ -1,6 +1,3 @@
-const http = require("http");
-const https = require("https");
-
 const getProtocol = (url) => {
     if (url.protocol === "https:") {
         return https;
