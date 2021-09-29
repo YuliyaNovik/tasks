@@ -1,14 +1,13 @@
 const { URL, urlToHttpOptions } = require("url");
-
-const PORT = 443;
+const { getProtocol } = require("./protocol");
 
 const getPostOptions = (url, bodyLength) => {
     const options = urlToHttpOptions(url);
-    options.port = PORT;
     options.method = "POST";
     options.headers = {
         "Content-Type": "application/json",
-        "Content-Length": bodyLength
+        "Content-Length": bodyLength,
+        "Authorization" :  "Bearer 0dc29e3dd7f2150891e88f13056fc44cd558dd0e8d43d064473c9ad803647de8"
     }
 
     return options;

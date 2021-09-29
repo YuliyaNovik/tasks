@@ -1,4 +1,5 @@
 const { URL } = require("url");
+const { getProtocol } = require("./protocol");
 
 const get = (urlString) => {
     return new Promise((resolve, reject) => {
@@ -22,12 +23,7 @@ const get = (urlString) => {
         } catch (error) {
             reject(error);
         }
-        
     })
 }
 
 module.exports = { get };
-
-
-
-
