@@ -1,6 +1,5 @@
 const { URL, urlToHttpOptions } = require("url");
-
-const PORT = 443;
+const { getProtocol } = require("./protocol");
 
 const getPostOptions = (url, bodyLength) => {
     const options = urlToHttpOptions(url);
