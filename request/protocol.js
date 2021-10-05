@@ -1,14 +1,8 @@
 const http = require("http");
 const https = require("https");
 
-const getProtocol = (url) => {
-    if (url.protocol === "https:") {
-        return https;
-    }
-    if (url.protocol === "http:") {
-        return http;
-    }
-    throw Error(`Protocol "${url.protocol}" isn"t supported`);
+const isProtocolSupported = (url) => {
+    return url.protocol === "https:" || url.protocol === "http:";
 }
 
-module.exports = { getProtocol };
+module.exports = { isProtocolSupported };

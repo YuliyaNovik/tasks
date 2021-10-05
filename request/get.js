@@ -1,29 +1,25 @@
-const { URL } = require("url");
-const { getProtocol } = require("./protocol");
+const http = require("http");
+const https = require("https");
+const { createURL } = require("./url");
 
 const get = (urlString) => {
-    return new Promise((resolve, reject) => {
-        try {
-            const url = new URL(urlString);
-            const protocol = getProtocol(url);
-            protocol.get(url, (response) => {
-                let data = "";
-    
-                response.on("data", (chunk) => {
-                    data += chunk;
+    return createURL(urlString)
+        .then((url) => {
+            return new Promise((resolve, reject) => {
+                const requestAlias = url.protocol == "http:" ? http : https;
+                requestAlias.get(url, (response) => {
+                    let data = "";
+        
+                    response.on("data", (chunk) => {
+                        data += chunk;
+                    });
+        
+                    response.on("end", () => resolve(data));
+                }).on("error", (error) => {
+                    return reject(error);
                 });
-    
-                response.on("end", () => {
-                    resolve(JSON.parse(data));
-                });
-    
-            }).on("error", (error) => {
-                reject(error);
-            });
-        } catch (error) {
-            reject(error);
-        }
-    })
+            })
+        })
 }
 
 module.exports = { get };
