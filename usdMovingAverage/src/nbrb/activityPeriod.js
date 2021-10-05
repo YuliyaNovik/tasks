@@ -1,5 +1,3 @@
-const { ActivityPeriod } = require("./models/activityPeriod");
-
 const getActivityPeriods = (currency, allCurrencies, startDate, endDate) => {
     let activityPeriods = allCurrencies
         .filter((item) => {
@@ -7,9 +5,11 @@ const getActivityPeriods = (currency, allCurrencies, startDate, endDate) => {
             (item.endDate <= endDate && item.endDate >= startDate || item.startDate <= endDate && item.startDate >= startDate)
         })
         .map((item) => {
-            const periodStart = item.startDate < startDate ? startDate : item.startDate;
-            const periodEnd = item.endDate < endDate ? item.endDate : endDate;
-            return new ActivityPeriod(item. id, periodStart, periodEnd);
+            return {
+                id: item.id,
+                startDate: item.startDate < startDate ? startDate : item.startDate,
+                endDate: item.endDate < endDate ? item.endDate : endDate
+            };
         })
     activityPeriods.sort((a, b) => a.startDate - b.startDate);
     return activityPeriods;
