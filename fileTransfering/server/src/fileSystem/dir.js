@@ -8,10 +8,10 @@ const createDir = async (path) => {
     } else {
         console.log(`"${path}" directory already exists`);
     }
-}
+};
 
 const readDir = (path) => {
     return readdir(path);
-}
+};
 
-module.exports = { createDir, readDir }
+module.exports = { createDir, readDir };
