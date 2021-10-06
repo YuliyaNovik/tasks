@@ -1,4 +1,3 @@
-
 const { getExchangeRates } = require("./nbrb");
 
 const getRatesForEachPeriod = async (activityPeriods) => {
@@ -9,7 +8,7 @@ const getRatesForEachPeriod = async (activityPeriods) => {
         ))
         .filter((item) => item.status === "fulfilled")
         .map((item) => item.value);
-    return rates;
+    return rates;ß
 }
 
-module.exports = { getRatesForEachPeriod }
+module.exports = { getRatesForEachPeriod } 

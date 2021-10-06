@@ -1,18 +1,19 @@
-const { ActivityPeriod } = require("./models/activityPeriod");
+const { isBetween } = require("./date");
 
 const getActivityPeriods = (currency, allCurrencies, startDate, endDate) => {
-    let activityPeriods = allCurrencies
+    return allCurrencies
         .filter((item) => {
             return item.parentId === currency.parentId && 
-            (item.endDate <= endDate && item.endDate >= startDate || item.startDate <= endDate && item.startDate >= startDate)
+            (isBetween(item.endDate, startDate, endDate) || isBetween(item.startDate, startDate, endDate))
         })
         .map((item) => {
-            const periodStart = item.startDate < startDate ? startDate : item.startDate;
-            const periodEnd = item.endDate < endDate ? item.endDate : endDate;
-            return new ActivityPeriod(item. id, periodStart, periodEnd);
+            return {
+                id: item.id,
+                startDate: item.startDate < startDate ? startDate : item.startDate,
+                endDate: item.endDate < endDate ? item.endDate : endDate
+            };
         })
-    activityPeriods.sort((a, b) => a.startDate - b.startDate);
-    return activityPeriods;
+        .sort((a, b) => a.startDate - b.startDate);
 }
 
 module.exports = { getActivityPeriods}

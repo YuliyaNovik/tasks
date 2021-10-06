@@ -1,11 +1,18 @@
-
 const { getAllCurrencies, getCurrenciesOnDate } = require("./nbrb/nbrb");
-const { writeRatesForCurrency } = require("./currency");
+const { getCurrencyRates } = require("./currency/currency");
+const { calculateMovingAverage } = require("./average/movingAverage");
+const { log } = require("./log/log");
 
-const writeExchangeRates = async (activeCurrencies, allCurrencies, startDate, endDate, outputPath, movingAverageInterval) => {
+const getRatesForCurrency = async (currency, allCurrencies, startDate, endDate, intervalLength) => {
+    const rates = await getCurrencyRates(currency, allCurrencies, startDate, endDate, intervalLength);
+    return calculateMovingAverage(rates, intervalLength);
+}
+
+const writeMovingAverageRates = async (activeCurrencies, allCurrencies, startDate, endDate, intervalLength) => {
     const results = await Promise.allSettled(
-        activeCurrencies.map((currency) => {
-            writeRatesForCurrency(currency, allCurrencies, startDate, endDate, outputPath, movingAverageInterval);
+        activeCurrencies.map(async (currency) => {
+            const movingAverageRates = await getRatesForCurrency(currency, allCurrencies, startDate, endDate, intervalLength);
+            log(currency.abbreviation, movingAverageRates);
         })
     );
 
@@ -16,14 +23,12 @@ const movingAverage = async (movingAverageInterval) => {
     try {
         const endDate = new Date();
         const startDate = new Date(endDate.getFullYear(), 0, 1);
-
         const activeCurrencies = await getCurrenciesOnDate(startDate);
         const allCurrencies = await getAllCurrencies();
-
-        await writeExchangeRates(activeCurrencies, allCurrencies, startDate, endDate, movingAverageInterval);
+        await writeMovingAverageRates(activeCurrencies, allCurrencies, startDate, endDate, movingAverageInterval);
     } catch (error) {
         console.log(error);
     }
 }
 
-module.exports = { movingAverage }
+module.exports = { movingAverage } 

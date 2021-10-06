@@ -5,4 +5,8 @@ const convertDate = (date) => {
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 }
 
-module.exports = { convertDate }
+const isBetween = (date, startDate, endDate) => {
+    return date <= endDate && date >= startDate;
+}
+
+module.exports = { convertDate, isBetween }
