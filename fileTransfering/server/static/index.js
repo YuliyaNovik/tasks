@@ -1,13 +1,20 @@
 const lists = document.getElementsByClassName("file-list");
 const API_URL = "http://localhost:3000";
 
-// имя файла с пробелом
 // обработчики хорошего ответа и не очень (лог статусов)
 // на сервере разные статусы возвращать
 // на сервере try catch во всех запросах
-// добавить fetch
 // ресурсы с одним именем
-// сброс имени файла
+// возвращать сущность
+
+const form = document.getElementById("form");
+
+form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    upload();
+    form.reset();
+    return false;
+});
 
 const addFileToList = (list, file) => {
     const li = document.createElement("li");
@@ -23,40 +30,39 @@ const addFileToList = (list, file) => {
     list.appendChild(li);
 };
 
-const getFiles = () => {
-    const xHttp = new XMLHttpRequest();
-    xHttp.onload = function (data) {
-        const files = JSON.parse(xHttp.response);
-        if (lists && lists[0]) {
-            const list = lists[0];
-            list.innerHTML = "";
-            for (const file of files) {
-                addFileToList(list, file);
-            }
+const getFiles = async () => {
+    const response = await fetch("/files");
+    const files = await response.json();
+
+    if (lists && lists[0]) {
+        const list = lists[0];
+        list.innerHTML = "";
+
+        for (const file of files) {
+            addFileToList(list, file);
         }
-    };
-    xHttp.open("GET", "/files", true);
-    xHttp.send();
+    }
 };
 
-const getFile = (name) => {
-    const xHttp = new XMLHttpRequest();
-    xHttp.open("GET", "/files/" + name, true);
-    xHttp.send();
+const getFile = async (name) => {
+    const response = await fetch("/files/" + name);
 };
 
-const upload = () => {
+const upload = async () => {
+    const list = lists[0];
     const selectedFile = document.getElementById("input").files[0];
     const formData = new FormData();
     formData.append("file", selectedFile);
-
-    const xHttp = new XMLHttpRequest();
-    xHttp.onload = function () {
+    try {
+        const response = await fetch("/files", {
+            method: "POST",
+            body: formData,
+        });
         console.log("Uploaded");
-    };
-    xHttp.open("POST", "/files", true);
-    xHttp.send(formData);
-    return false;
+        addFileToList(list, { id: selectedFile.name, name: selectedFile.name, mediaType: selectedFile.type });
+    } catch {
+
+    }
 };
 
 getFiles();

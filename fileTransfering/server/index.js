@@ -1,5 +1,5 @@
 const { Server } = require("./src/server");
-const { createDir } = require("./src/fileSystem/dir");
+const { createDir } = require("./src/utils/dir");
 const { getFileRouter } = require("./src/routes/fileRouter");
 
 const hostName = "127.0.0.1";

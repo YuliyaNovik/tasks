@@ -1,5 +1,5 @@
 class Router {
-    constructor(port, hostName) {
+    constructor() {
         this.routes = [];
     }
 

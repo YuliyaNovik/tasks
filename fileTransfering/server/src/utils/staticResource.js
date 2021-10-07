@@ -4,11 +4,10 @@ const { readFile } = require("fs/promises");
 const url = require("url");
 const path = require("path");
 
-const getHtmlPage = async (request) => {
+const getStaticResource = async (request) => {
     const staticPath = "./static";
 
-    const uri = url.parse(request.url).pathname;
-    let fileName = path.join(process.cwd(), staticPath, uri);
+    let fileName = path.join(process.cwd(), staticPath, request.url);
 
     if (!existsSync(fileName)) {
         response.writeHead(404, { "Content-Type": "text/plain" });
@@ -21,9 +20,7 @@ const getHtmlPage = async (request) => {
         fileName = path.join(fileName, "/index.html");
     }
 
-    const htmlPage = await readFile(fileName);
-
-    return htmlPage;
+    return await readFile(fileName);
 };
 
-module.exports = { getHtmlPage };
+module.exports = { getStaticResource };

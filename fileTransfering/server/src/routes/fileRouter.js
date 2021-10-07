@@ -40,7 +40,7 @@ const getFileRouter = () => {
         // router.sendEventToAll(fileName);
     })
     
-    router.get(/^\/files\/[\w\-\. ]+$/, async (request, response) => {
+    router.get(/^\/files\/((?!(\/|\\)).)*$/, async (request, response) => {
         await getFile(request, response);
     })
     

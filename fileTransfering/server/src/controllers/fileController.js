@@ -1,5 +1,5 @@
 const { extname, join} = require('path');
-const { readDir } = require("../fileSystem/dir");
+const { readDir } = require("../utils/dir");
 const { createReadStream, createWriteStream } = require("fs");
 const { getMimeTypeByExtension } = require("../utils/mimeType");
 // TODO: remove dependency

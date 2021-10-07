@@ -1,5 +1,5 @@
 const http = require("http");
-const { getHtmlPage } = require("./utils/htmlPage");
+const { getStaticResource } = require("./utils/staticResource");
 
 class Server {
     constructor(port, hostName) {
@@ -7,6 +7,8 @@ class Server {
         this.clients = [];
 
         this._server = http.createServer(async (request, response) => {
+            request.url = decodeURIComponent(request.url);
+
             const route = this.routers
                 .map((router) => router.routes)
                 .flat()
@@ -18,9 +20,9 @@ class Server {
             }
 
             try {
-                const htmlPage = await getHtmlPage(request);
-                response.writeHead(200, { "Content-Type": "text/html" });
-                response.end(htmlPage);
+                const staticResource = await getStaticResource(request);
+                response.writeHead(200);
+                response.end(staticResource);
             } catch (error) {
                 response.writeHead(500, { "Content-Type": "text/plain" });
                 response.write(error + "\n");
