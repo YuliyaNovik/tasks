@@ -1,9 +1,11 @@
 const { extname, join} = require('path');
 const { readDir } = require("../fileSystem/dir");
 const { createReadStream, createWriteStream } = require("fs");
-const { getMimeTypeByExtension } = require("../type/mimeType");
+const { getMimeTypeByExtension } = require("../utils/mimeType");
+// TODO: remove dependency
+const storageDir = "storage";
 
-const getFile = async (request, response, storageDir) => {
+const getFile = async (request, response) => {
     const fileName = request.url.slice("/files/".length);
     const filePath = join(storageDir, fileName);
     const readStream = createReadStream(filePath);
@@ -13,24 +15,18 @@ const getFile = async (request, response, storageDir) => {
         response.end('File not found or you made an invalid request.')
     });
 
-    // if (request.headers["accept"] === "multipart/byteranges") {
-        mediaType = "multipart/byteranges";
-    // } else {
-    //     const extension = extname(filePath)
-    //     if (extension.length > 0) {
-    //         mediaType = getMimeTypeByExtension(extension.slice(1))
-    //     }
-    // }
-
+    const mediaType = "multipart/byteranges";
     response.setHeader('Content-Type', mediaType)
     readStream.pipe(response);
 }
 
-const getAllFiles = async (request, response, storageDir) => {
+const getAllFiles = async (request, response) => {
     const fileNames = await readDir(storageDir);
     const files = fileNames.map((name) => {
         let extension = extname(name);
-        let mediaType;
+        if (extension.length > 0) {
+            extension = extension.slice(1);
+        }
         const mediaType = getMimeTypeByExtension(extension);
         return {
             id: name,
@@ -44,7 +40,7 @@ const getAllFiles = async (request, response, storageDir) => {
     response.end(JSON.stringify(files));
 }
 
-const saveFile = async (request, response, storageDir) => {
+const saveFile = async (request, response) => {
     return new Promise((resolve, reject) => {
         const contentType = request.headers["content-type"];
 

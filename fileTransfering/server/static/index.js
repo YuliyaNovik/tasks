@@ -6,8 +6,10 @@ const API_URL = "http://localhost:3000";
 // на сервере разные статусы возвращать
 // на сервере try catch во всех запросах
 // добавить fetch
+// ресурсы с одним именем
+// сброс имени файла
 
-const addFileToList = () => {
+const addFileToList = (list, file) => {
     const li = document.createElement("li");
     if (file.mediaType && file.mediaType.startsWith("image/")) {
         li.innerHTML = `<a href="${API_URL}/files/${file.id}">
