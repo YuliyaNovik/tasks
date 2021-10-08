@@ -32,22 +32,34 @@ const getFileRouter = () => {
     const router = new Router();
 
     router.get("/files", async (request, response) => {
-        await getAllFiles(request, response);
-    })
-    
+        try {
+            await getAllFiles(request, response);
+        } catch (error) {
+            console.log(error);
+        }
+    });
+
     router.post("/files", async (request, response) => {
-        const fileName = await saveFile(request, response);
-        // router.sendEventToAll(fileName);
-    })
-    
+        try {
+            const fileName = await saveFile(request, response);
+            // router.sendEventToAll(fileName);
+        } catch (error) {
+            console.log(error);
+        }
+    });
+
     router.get(/^\/files\/((?!(\/|\\)).)*$/, async (request, response) => {
-        await getFile(request, response);
-    })
-    
+        try {
+            await getFile(request, response);
+        } catch (error) {
+            console.log(error);
+        }
+    });
+
     // router.get("/events", (request, response) => {
     //     eventsHandler(request, response);
     // })
     return router;
-}
+};
 
 module.exports = { getFileRouter };

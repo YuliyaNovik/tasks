@@ -1,4 +1,5 @@
 const http = require("http");
+const { HttpStatusCode } = require("./utils/httpStatusCode");
 const { getStaticResource } = require("./utils/staticResource");
 
 class Server {
@@ -21,10 +22,10 @@ class Server {
 
             try {
                 const staticResource = await getStaticResource(request);
-                response.writeHead(200);
+                response.writeHead(HttpStatusCode.OK);
                 response.end(staticResource);
             } catch (error) {
-                response.writeHead(500, { "Content-Type": "text/plain" });
+                response.writeHead(HttpStatusCode.INTERNAL_SERVER, { "Content-Type": "text/plain" });
                 response.write(error + "\n");
                 response.end();
                 return;

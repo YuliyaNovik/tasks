@@ -6,6 +6,10 @@ const hostName = "127.0.0.1";
 const STORAGE_DIR = process.env.STORAGE_DIR || "storage";
 const PORT = process.env.PORT || 3000;
 
+process.on('uncaughtException', function (err) {
+    console.error(err.stack);
+});
+
 const initStorage = async (storageDir) => {
     await createDir(storageDir);
 };

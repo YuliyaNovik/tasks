@@ -3,9 +3,6 @@ const API_URL = "http://localhost:3000";
 
 // обработчики хорошего ответа и не очень (лог статусов)
 // на сервере разные статусы возвращать
-// на сервере try catch во всех запросах
-// ресурсы с одним именем
-// возвращать сущность
 
 const form = document.getElementById("form");
 
@@ -18,13 +15,18 @@ form.addEventListener("submit", (e) => {
 
 const addFileToList = (list, file) => {
     const li = document.createElement("li");
+
+    // const link = `${API_URL}/files/${encodeURIComponent(file.id)}`;
+    const link = `${API_URL}/files/${file.id}`;
+
+
     if (file.mediaType && file.mediaType.startsWith("image/")) {
-        li.innerHTML = `<a href="${API_URL}/files/${file.id}">
-                            <img src="${API_URL}/files/${file.id}"/>
+        li.innerHTML = `<a href="${link}">
+                            <img src="${link}"/>
                             ${file.name}
                         </a>`;
     } else {
-        li.innerHTML = `<a href="${API_URL}/files/${file.id}">${file.name}</a>`;
+        li.innerHTML = `<a href="${link}">${file.name}</a>`;
     }
     li.addEventListener("click", () => getFile(file.id));
     list.appendChild(li);
@@ -58,8 +60,10 @@ const upload = async () => {
             method: "POST",
             body: formData,
         });
-        console.log("Uploaded");
-        addFileToList(list, { id: selectedFile.name, name: selectedFile.name, mediaType: selectedFile.type });
+        if (response.status === 201) {
+            console.log("Uploaded");
+            addFileToList(list, { id: selectedFile.name, name: selectedFile.name, mediaType: selectedFile.type });
+        }
     } catch {
 
     }
