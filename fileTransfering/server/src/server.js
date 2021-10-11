@@ -26,15 +26,12 @@ class Server {
                     response.writeHead(HttpStatusCode.OK);
                     response.end(staticResource);
                 } else {
-                    response.statusCode = HttpStatusCode.NOT_FOUND;
-                    response.setHeader("Content-Type", "text/plain");
-                    const errorMessage = "Not Found: " + request.url;
-                    response.end(errorMessage);
+                    response.writeHead(HttpStatusCode.NOT_FOUND, {"Content-Type": "text/plain"});
+                    response.end("Not Found: " + request.url);
                 }
             } catch (error) {
                 response.writeHead(HttpStatusCode.INTERNAL_SERVER, { "Content-Type": "text/plain" });
-                const errorMessage = "Internal Server Error: " + error;
-                response.end(errorMessage);
+                response.end("Internal Server Error: " + error);
                 return;
             }
         });

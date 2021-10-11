@@ -16,24 +16,18 @@ class FileController {
             const filePath = join(this._storageDir, fileName);
 
             if (!existsSync(filePath) || statSync(filePath).isDirectory()) {
-                response.statusCode = HttpStatusCode.NOT_FOUND;
-                response.setHeader("Content-Type", "text/plain");
+                response.writeHead(HttpStatusCode.NOT_FOUND, {"Content-Type": "text/plain"});
                 const errorMessage = "Not Found: " + filePath;
                 response.end(errorMessage);
                 return;
             }
 
             const readStream = createReadStream(filePath);
-
-            response.statusCode = HttpStatusCode.OK;
-            const mediaType = "multipart/byteranges";
-            response.setHeader("Content-Type", mediaType);
+            response.writeHead(HttpStatusCode.OK, {"Content-Type": "multipart/byteranges"});
             readStream.pipe(response);
         } catch (error) {
-            response.statusCode = HttpStatusCode.INTERNAL_SERVER;
-            response.setHeader("Content-Type", "text/plain");
-            const errorMessage = "Internal server error: " + error;
-            response.end(errorMessage);
+            response.writeHead(HttpStatusCode.INTERNAL_SERVER, {"Content-Type": "text/plain"});
+            response.end("Internal Server Error: " + error);
         }
     }
 
@@ -53,14 +47,11 @@ class FileController {
                 };
             });
 
-            response.statusCode = HttpStatusCode.OK;
-            response.setHeader("Content-Type", "application/json");
+            response.writeHead(HttpStatusCode.OK, {"Content-Type": "application/json"});
             response.end(JSON.stringify(files));
         } catch (error) {
-            response.statusCode = HttpStatusCode.INTERNAL_SERVER;
-            response.setHeader("Content-Type", "text/plain");
-            const errorMessage = "Internal server error: " + error;
-            response.end(errorMessage);
+            response.writeHead(HttpStatusCode.INTERNAL_SERVER, {"Content-Type": "text/plain"});
+            response.end("Internal Server Error: " + error);
         }
     }
 
@@ -112,15 +103,13 @@ class FileController {
                 });
 
                 request.on("error", () => {
-                    response.statusCode = 500;
-                    response.setHeader("Content-Type", "application/json");
-                    response.end();
+                    response.writeHead(HttpStatusCode.INTERNAL_SERVER, {"Content-Type": "text/plain"});
+                    response.end("Internal Server Error: " + error);
                     return reject();
                 });
             });
 
-            response.statusCode = HttpStatusCode.CREATED;
-            response.setHeader("Content-Type", "application/json");
+            response.writeHead(HttpStatusCode.CREATED, {"Content-Type": "application/json"});
             response.end(
                 JSON.stringify({
                     id: fileName,
@@ -129,10 +118,8 @@ class FileController {
                 })
             );
         } catch (error) {
-            response.statusCode = HttpStatusCode.INTERNAL_SERVER;
-            response.setHeader("Content-Type", "text/plain");
-            const errorMessage = "Internal server error: " + error;
-            response.end(errorMessage);
+            response.writeHead(HttpStatusCode.INTERNAL_SERVER, {"Content-Type": "text/plain"});
+            response.end("Internal Server Error: " + error);
         }
     }
 
