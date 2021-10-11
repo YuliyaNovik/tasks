@@ -1,5 +1,6 @@
 const http = require("http");
 const { HttpStatusCode } = require("./utils/httpStatusCode");
+const { Response } = require("./utils/response");
 const { getStaticResource } = require("./utils/staticResource");
 
 class Server {
@@ -15,23 +16,21 @@ class Server {
                 .flat()
                 .find((route) => this._compareURL(route.url, request.url) && route.method === request.method);
 
+            const responseWrapper = new Response(response);
             if (route) {
-                route.callback(request, response);
+                route.callback(request, responseWrapper);
                 return;
             }
 
             try {
-                const staticResource = await getStaticResource(request, response);
+                const staticResource = await getStaticResource(request);
                 if (staticResource) {
-                    response.writeHead(HttpStatusCode.OK);
-                    response.end(staticResource);
+                    responseWrapper.statusCode(HttpStatusCode.OK).end(staticResource);
                 } else {
-                    response.writeHead(HttpStatusCode.NOT_FOUND, {"Content-Type": "text/plain"});
-                    response.end("Not Found: " + request.url);
+                    responseWrapper.notFound(request.url);
                 }
             } catch (error) {
-                response.writeHead(HttpStatusCode.INTERNAL_SERVER, { "Content-Type": "text/plain" });
-                response.end("Internal Server Error: " + error);
+                response.internalServerError(error);
                 return;
             }
         });

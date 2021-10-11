@@ -1,5 +1,5 @@
 const { Router } = require("./router");
-const FileController = require("../controllers/fileController");
+const { FileController } = require("../controllers/fileController");
 
 const getFileRouter = (storageDir) => {
     const router = new Router();

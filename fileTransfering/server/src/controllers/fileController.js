@@ -3,7 +3,7 @@ const { readDir } = require("../utils/dir");
 const { createReadStream, existsSync, statSync } = require("fs");
 const { createWriteStream } = require("../utils/writeStream");
 const { getMimeTypeByExtension } = require("../utils/mimeType");
-const { HttpStatusCode } = require("../utils/httpStatusCode");
+const { getFileInfo, getBoundary } = require("../utils/formData");
 
 class FileController {
     constructor(storageDir) {
@@ -16,18 +16,14 @@ class FileController {
             const filePath = join(this._storageDir, fileName);
 
             if (!existsSync(filePath) || statSync(filePath).isDirectory()) {
-                response.writeHead(HttpStatusCode.NOT_FOUND, {"Content-Type": "text/plain"});
-                const errorMessage = "Not Found: " + filePath;
-                response.end(errorMessage);
+                response.notFound();
                 return;
             }
 
             const readStream = createReadStream(filePath);
-            response.writeHead(HttpStatusCode.OK, {"Content-Type": "multipart/byteranges"});
-            readStream.pipe(response);
+            response.byteStream(readStream);
         } catch (error) {
-            response.writeHead(HttpStatusCode.INTERNAL_SERVER, {"Content-Type": "text/plain"});
-            response.end("Internal Server Error: " + error);
+            response.internalServerError(error);
         }
     }
 
@@ -47,18 +43,16 @@ class FileController {
                 };
             });
 
-            response.writeHead(HttpStatusCode.OK, {"Content-Type": "application/json"});
-            response.end(JSON.stringify(files));
+            response.ok(JSON.stringify(files));
         } catch (error) {
-            response.writeHead(HttpStatusCode.INTERNAL_SERVER, {"Content-Type": "text/plain"});
-            response.end("Internal Server Error: " + error);
+            response.internalServerError(error);
         }
     }
 
     async saveFile(request, response) {
         try {
             const { fileName, mediaType } = await new Promise((resolve, reject) => {
-                const boundary = Buffer.from(this._getBoundary(request.headers));
+                const boundary = Buffer.from(getBoundary(request.headers));
 
                 let writeStream;
                 let fileInfo;
@@ -71,16 +65,14 @@ class FileController {
 
                         const metaData = data.slice(0, index + emptyLine.length).toString();
 
-                        fileInfo = this._getFileInfo(metaData);
+                        fileInfo = getFileInfo(metaData);
 
                         const dataChunk = data.slice(index + emptyLine.length);
                         const filePath = join(this._storageDir, fileInfo.fileName);
 
                         if (existsSync(filePath)) {
-                            response.statusCode = HttpStatusCode.UNPROCESSABLE_ENTITY;
-                            const errorMessage = "Resource already exists";
-                            response.end(errorMessage);
-                            reject(errorMessage);
+                            response.unprocessableEntity(filePath);
+                            reject();
                         } else {
                             writeStream = createWriteStream(filePath);
                             write(dataChunk, lineBreak + boundary, writeStream);
@@ -103,14 +95,12 @@ class FileController {
                 });
 
                 request.on("error", () => {
-                    response.writeHead(HttpStatusCode.INTERNAL_SERVER, {"Content-Type": "text/plain"});
-                    response.end("Internal Server Error: " + error);
+                    response.internalServerError(error);
                     return reject();
                 });
             });
 
-            response.writeHead(HttpStatusCode.CREATED, {"Content-Type": "application/json"});
-            response.end(
+            response.created(
                 JSON.stringify({
                     id: fileName,
                     name: fileName,
@@ -118,36 +108,9 @@ class FileController {
                 })
             );
         } catch (error) {
-            response.writeHead(HttpStatusCode.INTERNAL_SERVER, {"Content-Type": "text/plain"});
-            response.end("Internal Server Error: " + error);
+            response.internalServerError(error);
         }
-    }
-
-    _getBoundary(headers) {
-        const contentType = headers["content-type"];
-        const boundaries = contentType
-            .split("; ")
-            .filter((value) => value.startsWith("boundary"))
-            .map((value) => "--" + value.split("boundary=").join(""));
-
-        if (boundaries.length < 1) {
-            throw new Error("Boundary is not defined");
-        }
-
-        return boundaries[0];
-    }
-
-    _getFileInfo(metaData) {
-        const metaDataLines = metaData.split("\r\n");
-        const fileName = metaDataLines[1]
-            .split("; ")
-            .filter((value) => value.startsWith("filename="))
-            .map((value) => value.slice("filename=".length + 1, value.length - 1))[0];
-
-        const mediaType = metaDataLines[2].split(" ")[1];
-
-        return { fileName, mediaType };
     }
 }
 
-module.exports = FileController;
+module.exports = { FileController };
