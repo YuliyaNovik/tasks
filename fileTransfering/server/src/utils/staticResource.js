@@ -1,25 +1,21 @@
 const { existsSync, statSync } = require("fs");
 const { readFile } = require("fs/promises");
 const path = require("path");
-const { HttpStatusCode } = require("./httpStatusCode");
 
-const getStaticResource = async (request) => {
+const getStaticResource = async (request, response) => {
     const staticPath = "./static";
 
-    let fileName = path.join(process.cwd(), staticPath, request.url);
+    let filePath = path.join(process.cwd(), staticPath, request.url);
 
-    if (!existsSync(fileName)) {
-        response.writeHead(HttpStatusCode.NOT_FOUND, { "Content-Type": "text/plain" });
-        response.write("404 Not Found\n");
-        response.end();
+    if (!existsSync(filePath)) {
         return;
     }
 
-    if (statSync(fileName).isDirectory()) {
-        fileName = path.join(fileName, "/index.html");
+    if (statSync(filePath).isDirectory()) {
+        filePath = path.join(filePath, "/index.html");
     }
 
-    return await readFile(fileName);
+    return await readFile(filePath);
 };
 
 module.exports = { getStaticResource };

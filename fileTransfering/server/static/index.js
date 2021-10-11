@@ -1,4 +1,4 @@
-const lists = document.getElementsByClassName("file-list");
+const list = document.getElementById("file-list");
 const API_URL = "http://localhost:3000";
 
 // обработчики хорошего ответа и не очень (лог статусов)
@@ -16,9 +16,7 @@ form.addEventListener("submit", (e) => {
 const addFileToList = (list, file) => {
     const li = document.createElement("li");
 
-    // const link = `${API_URL}/files/${encodeURIComponent(file.id)}`;
     const link = `${API_URL}/files/${file.id}`;
-
 
     if (file.mediaType && file.mediaType.startsWith("image/")) {
         li.innerHTML = `<a href="${link}">
@@ -36,8 +34,7 @@ const getFiles = async () => {
     const response = await fetch("/files");
     const files = await response.json();
 
-    if (lists && lists[0]) {
-        const list = lists[0];
+    if (list) {
         list.innerHTML = "";
 
         for (const file of files) {
@@ -51,8 +48,11 @@ const getFile = async (name) => {
 };
 
 const upload = async () => {
-    const list = lists[0];
-    const selectedFile = document.getElementById("input").files[0];
+    const input = document.getElementById("input");
+    if (!input || !input.files || input.files.length < 1) {
+        return;
+    }
+    const selectedFile = input.files[0]
     const formData = new FormData();
     formData.append("file", selectedFile);
     try {
@@ -63,6 +63,8 @@ const upload = async () => {
         if (response.status === 201) {
             console.log("Uploaded");
             addFileToList(list, { id: selectedFile.name, name: selectedFile.name, mediaType: selectedFile.type });
+        } else {
+            console.log(response.statusText);
         }
     } catch {
 

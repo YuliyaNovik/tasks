@@ -21,13 +21,20 @@ class Server {
             }
 
             try {
-                const staticResource = await getStaticResource(request);
-                response.writeHead(HttpStatusCode.OK);
-                response.end(staticResource);
+                const staticResource = await getStaticResource(request, response);
+                if (staticResource) {
+                    response.writeHead(HttpStatusCode.OK);
+                    response.end(staticResource);
+                } else {
+                    response.statusCode = HttpStatusCode.NOT_FOUND;
+                    response.setHeader("Content-Type", "text/plain");
+                    const errorMessage = "Not Found: " + request.url;
+                    response.end(errorMessage);
+                }
             } catch (error) {
                 response.writeHead(HttpStatusCode.INTERNAL_SERVER, { "Content-Type": "text/plain" });
-                response.write(error + "\n");
-                response.end();
+                const errorMessage = "Internal Server Error: " + error;
+                response.end(errorMessage);
                 return;
             }
         });
