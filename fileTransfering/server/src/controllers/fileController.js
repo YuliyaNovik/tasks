@@ -6,17 +6,15 @@ const { getMimeTypeByExtension } = require("../utils/mimeType");
 const { HttpStatusCode } = require("../utils/httpStatusCode");
 
 class FileController {
-
     constructor(storageDir) {
         this._storageDir = storageDir;
     }
-
 
     async getFile(request, response) {
         try {
             const fileName = request.url.slice("/files/".length);
             const filePath = join(this._storageDir, fileName);
-    
+
             if (!existsSync(filePath) || statSync(filePath).isDirectory()) {
                 response.statusCode = HttpStatusCode.NOT_FOUND;
                 response.setHeader("Content-Type", "text/plain");
@@ -24,9 +22,9 @@ class FileController {
                 response.end(errorMessage);
                 return;
             }
-    
+
             const readStream = createReadStream(filePath);
-    
+
             response.statusCode = HttpStatusCode.OK;
             const mediaType = "multipart/byteranges";
             response.setHeader("Content-Type", mediaType);
@@ -37,8 +35,8 @@ class FileController {
             const errorMessage = "Internal server error: " + error;
             response.end(errorMessage);
         }
-    };
-    
+    }
+
     async getAllFiles(request, response) {
         try {
             const fileNames = await readDir(this._storageDir);
@@ -54,7 +52,7 @@ class FileController {
                     mediaType,
                 };
             });
-    
+
             response.statusCode = HttpStatusCode.OK;
             response.setHeader("Content-Type", "application/json");
             response.end(JSON.stringify(files));
@@ -64,46 +62,29 @@ class FileController {
             const errorMessage = "Internal server error: " + error;
             response.end(errorMessage);
         }
-    };
-    
+    }
+
     async saveFile(request, response) {
         try {
             const { fileName, mediaType } = await new Promise((resolve, reject) => {
-                const contentType = request.headers["content-type"];
-    
-                const boundaries = contentType
-                    .split("; ")
-                    .filter((value) => value.startsWith("boundary"))
-                    .map((value) => "--" + value.split("boundary=").join(""));
-    
-                if (boundaries.length < 1) {
-                    throw new Error("Boundary is not defined");
-                }
-                const boundary = Buffer.from(boundaries[0]);
-    
+                const boundary = Buffer.from(this._getBoundary(request.headers));
+
                 let writeStream;
-                let fileName;
-                let mediaType;
+                let fileInfo;
                 const emptyLine = Buffer.from("\r\n\r\n");
-                const shiftLine = Buffer.from("\r\n");
-    
+                const lineBreak = Buffer.from("\r\n");
+
                 request.on("data", (data) => {
                     if (data.indexOf(boundary) === 0) {
                         const index = data.indexOf(emptyLine);
-    
+
                         const metaData = data.slice(0, index + emptyLine.length).toString();
-                        const metaDataLines = metaData.split("\r\n");
-    
-                        fileName = metaDataLines[1]
-                            .split("; ")
-                            .filter((value) => value.startsWith("filename="))
-                            .map((value) => value.slice("filename=".length + 1, value.length - 1))[0];
-    
-                        mediaType = metaDataLines[2].split(" ")[1];
-    
+
+                        fileInfo = this._getFileInfo(metaData);
+
                         const dataChunk = data.slice(index + emptyLine.length);
-                        const filePath = join(this._storageDir, fileName);
-    
+                        const filePath = join(this._storageDir, fileInfo.fileName);
+
                         if (existsSync(filePath)) {
                             response.statusCode = HttpStatusCode.UNPROCESSABLE_ENTITY;
                             const errorMessage = "Resource already exists";
@@ -111,13 +92,13 @@ class FileController {
                             reject(errorMessage);
                         } else {
                             writeStream = createWriteStream(filePath);
-                            write(dataChunk, shiftLine + boundary, writeStream);
+                            write(dataChunk, lineBreak + boundary, writeStream);
                         }
                     } else if (writeStream) {
-                        write(data, shiftLine + boundary, writeStream);
+                        write(data, lineBreak + boundary, writeStream);
                     }
                 });
-    
+
                 const write = (data, endStr, writeStream) => {
                     if (data.length >= 0) {
                         const borderIndex = data.indexOf(endStr);
@@ -125,11 +106,11 @@ class FileController {
                         writeStream.write(chunkToWrite);
                     }
                 };
-    
+
                 request.on("end", () => {
-                    return resolve({ fileName, mediaType});
+                    return resolve(fileInfo);
                 });
-    
+
                 request.on("error", () => {
                     response.statusCode = 500;
                     response.setHeader("Content-Type", "application/json");
@@ -137,7 +118,7 @@ class FileController {
                     return reject();
                 });
             });
-    
+
             response.statusCode = HttpStatusCode.CREATED;
             response.setHeader("Content-Type", "application/json");
             response.end(
@@ -153,7 +134,33 @@ class FileController {
             const errorMessage = "Internal server error: " + error;
             response.end(errorMessage);
         }
-    };
+    }
+
+    _getBoundary(headers) {
+        const contentType = headers["content-type"];
+        const boundaries = contentType
+            .split("; ")
+            .filter((value) => value.startsWith("boundary"))
+            .map((value) => "--" + value.split("boundary=").join(""));
+
+        if (boundaries.length < 1) {
+            throw new Error("Boundary is not defined");
+        }
+
+        return boundaries[0];
+    }
+
+    _getFileInfo(metaData) {
+        const metaDataLines = metaData.split("\r\n");
+        const fileName = metaDataLines[1]
+            .split("; ")
+            .filter((value) => value.startsWith("filename="))
+            .map((value) => value.slice("filename=".length + 1, value.length - 1))[0];
+
+        const mediaType = metaDataLines[2].split(" ")[1];
+
+        return { fileName, mediaType };
+    }
 }
 
 module.exports = FileController;
