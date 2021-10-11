@@ -1,9 +1,6 @@
 const list = document.getElementById("file-list");
 const API_URL = "http://localhost:3000";
 
-// обработчики хорошего ответа и не очень (лог статусов)
-// на сервере разные статусы возвращать
-
 const form = document.getElementById("form");
 
 form.addEventListener("submit", (e) => {
@@ -34,7 +31,7 @@ const getFiles = async () => {
     const response = await fetch("/files");
     const files = await response.json();
 
-    if (list) {
+    if (list && response.status === 200) {
         list.innerHTML = "";
 
         for (const file of files) {

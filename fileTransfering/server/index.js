@@ -16,7 +16,7 @@ const initStorage = async (storageDir) => {
 
 const initServer = async (PORT, hostName, storageDir) => {
     const server = new Server(PORT, hostName);
-    server.addRouter(getFileRouter());
+    server.addRouter(getFileRouter(storageDir));
 };
 
 const main = async () => {
