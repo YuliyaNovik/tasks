@@ -10,6 +10,10 @@ form.addEventListener("submit", (e) => {
     return false;
 });
 
+const logResponseError = (response) => {
+    const reason = await response.text();
+    console.log(response.statusText + " " + reason);
+}
 const addFileToList = (list, file) => {
     const li = document.createElement("li");
 
@@ -37,11 +41,17 @@ const getFiles = async () => {
         for (const file of files) {
             addFileToList(list, file);
         }
+    } else {
+        logResponseError(response);
     }
 };
 
 const getFile = async (name) => {
     const response = await fetch("/files/" + name);
+
+    if (response.status !== 200) {
+        logResponseError(response);
+    }
 };
 
 const upload = async () => {
@@ -61,10 +71,10 @@ const upload = async () => {
             console.log("Uploaded");
             addFileToList(list, { id: selectedFile.name, name: selectedFile.name, mediaType: selectedFile.type });
         } else {
-            console.log(response.statusText);
+            logResponseError(response);
         }
-    } catch {
-
+    } catch (error) {
+        console.log(error);
     }
 };
 
