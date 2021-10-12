@@ -74,8 +74,10 @@ class FileController {
                         const filePath = join(this._storageDir, fileInfo.fileName);
 
                         if (existsSync(filePath)) {
-                            isRejected = true;
-                            reject(new UnprocessableEntityError(fileInfo.fileName));
+                            if (!isRejected) {
+                                isRejected = true;
+                                reject(new UnprocessableEntityError(fileInfo.fileName));
+                            }
                         } else {
                             writeStream = createWriteStream(filePath);
                             write(dataChunk, lineBreak + boundary, writeStream);
@@ -98,7 +100,10 @@ class FileController {
                 });
 
                 request.on("error", (error) => {
-                    !isRejected && reject(error);
+                    if (!isRejected) {
+                        isRejected = true;
+                        reject(error);
+                    }
                 });
             });
 

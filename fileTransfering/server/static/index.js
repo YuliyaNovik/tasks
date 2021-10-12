@@ -10,7 +10,7 @@ form.addEventListener("submit", (e) => {
     return false;
 });
 
-const logResponseError = (response) => {
+const logResponseError = async (response) => {
     const reason = await response.text();
     console.log(response.statusText + " " + reason);
 }
