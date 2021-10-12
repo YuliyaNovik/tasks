@@ -47,4 +47,14 @@ class Response {
     byteStream(stream) {
         this.statusCode(HttpStatusCode.OK).header("Content-Type", "multipart/byteranges").pipeToStream(stream);
     }
+
+    ok(data) {
+        this.statusCode(HttpStatusCode.OK).header("Content-Type", "application/json").end(data);
+    }
+
+    created(data) {
+        this.statusCode(HttpStatusCode.CREATED).header("Content-Type", "application/json").end(data);
+    }
 }
+
+module.exports = { Response };

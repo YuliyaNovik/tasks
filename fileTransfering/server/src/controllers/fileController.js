@@ -30,6 +30,7 @@ class FileController {
     async getAllFiles(request, response) {
         try {
             const fileNames = await readDir(this._storageDir);
+
             const files = fileNames.map((name) => {
                 let extension = extname(name);
                 if (extension.length > 0) {
@@ -59,6 +60,8 @@ class FileController {
                 const emptyLine = Buffer.from("\r\n\r\n");
                 const lineBreak = Buffer.from("\r\n");
 
+                let isRejected = false;
+
                 request.on("data", (data) => {
                     if (data.indexOf(boundary) === 0) {
                         const index = data.indexOf(emptyLine);
@@ -71,8 +74,8 @@ class FileController {
                         const filePath = join(this._storageDir, fileInfo.fileName);
 
                         if (existsSync(filePath)) {
-                            response.unprocessableEntity(filePath);
-                            reject();
+                            isRejected = true;
+                            reject(new UnprocessableEntityError(fileInfo.fileName));
                         } else {
                             writeStream = createWriteStream(filePath);
                             write(dataChunk, lineBreak + boundary, writeStream);
@@ -91,12 +94,11 @@ class FileController {
                 };
 
                 request.on("end", () => {
-                    return resolve(fileInfo);
+                    !isRejected && resolve(fileInfo);
                 });
 
-                request.on("error", () => {
-                    response.internalServerError(error);
-                    return reject();
+                request.on("error", (error) => {
+                    !isRejected && reject(error);
                 });
             });
 
@@ -108,8 +110,18 @@ class FileController {
                 })
             );
         } catch (error) {
-            response.internalServerError(error);
+            if (error instanceof UnprocessableEntityError) {
+                response.unprocessableEntity(error.message);
+            } else {
+                response.internalServerError(error);
+            }
         }
+    }
+}
+
+class UnprocessableEntityError extends Error {
+    constructor(message) {
+        super(message);
     }
 }
 

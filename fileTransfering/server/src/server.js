@@ -36,6 +36,9 @@ class Server {
         });
 
         this._server.on("clientError", function onClientError(err, socket) {
+            if (err.code === 'ECONNRESET' || !socket.writable) {
+                return;
+            }
             console.log("clientError", err);
             socket.end("400 Bad Request\r\n\r\n");
         });
