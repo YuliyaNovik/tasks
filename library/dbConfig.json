@@ -1,0 +1,5 @@
+{
+    "database": "librarydb",
+    "user": "admin",
+    "host": "localhost"
+}
