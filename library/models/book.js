@@ -1,8 +1,14 @@
 const { connection } = require("../utils/db.js");
 
 const Book = (book) => {
+    this.id = book.id;
     this.author = book.author;
     this.name = book.name;
+    this.annotation = book.annotation;
+    this.originalName = book.originalName;
+    this.originalAuthor = book.originalAuthor;
+    this.indoorAccess = !!book.indoorAccess;
+    this.language = book.language;
 };
 
 const create = (newBook, callback) => {
@@ -38,7 +44,7 @@ const getById = (id, callback) => {
 
 const getAll = (callback) => {
     connection.query(
-        "SELECT book.id, book.name, author_name.name as author FROM book INNER JOIN author_name ON book.author_id = author_name.author_id AND book.language_id = author_name.language_id;",
+        "SELECT book.id, book.name, book.annotation, book.author as author, original.author as originalAuthor, original.name as originalName, book.indoor_access as indoorAccess FROM book_view book LEFT JOIN book_view original on book.original_id = original.id;",
         (error, res) => {
             if (error) {
                 console.log("Error: ", error);
