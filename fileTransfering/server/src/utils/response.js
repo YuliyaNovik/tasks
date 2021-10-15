@@ -41,7 +41,9 @@ class Response {
     }
 
     unprocessableEntity(resourceKey) {
-        this.statusCode(HttpStatusCode.UNPROCESSABLE_ENTITY).header("Content-Type", "text/plain").end("Already exists: " + resourceKey);
+        this.statusCode(HttpStatusCode.UNPROCESSABLE_ENTITY)
+            .header("Content-Type", "text/plain")
+            .end("Already exists: " + resourceKey);
     }
 
     byteStream(stream) {
@@ -52,8 +54,11 @@ class Response {
         this.statusCode(HttpStatusCode.OK).header("Content-Type", "application/json").end(data);
     }
 
-    created(data) {
-        this.statusCode(HttpStatusCode.CREATED).header("Content-Type", "application/json").end(data);
+    created(location, data) {
+        this.statusCode(HttpStatusCode.CREATED)
+            .header("Location", location)
+            .header("Content-Type", "application/json")
+            .end(data);
     }
 }
 

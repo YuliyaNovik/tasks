@@ -107,7 +107,7 @@ class FileController {
                 });
             });
 
-            response.created(
+            response.created(join(request.headers.origin, request.url, fileName),
                 JSON.stringify({
                     id: fileName,
                     name: fileName,
