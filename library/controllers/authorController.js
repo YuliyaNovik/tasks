@@ -12,46 +12,43 @@ const create = (request, response) => {
         languageId: request.body.languageId,
     });
 
-    Author.create(author, (error, data) => {
-        if (error) {
-            response
-                .statusCode(HttpStatusCode.INTERNAL_SERVER)
-                .send(error.message || "Some error occurred on creating the author.");
-        } else {
-            // TODO: add location
-            const location = "";
-            response.created(location, data);
-        }
-    });
+    try {
+        const resource = await Author.create(author);
+        // TODO: add location
+        const location = "";
+        response.created(location, resource);
+    } catch (error) {
+        response
+            .statusCode(HttpStatusCode.INTERNAL_SERVER)
+            .send(error.message || "Some error occurred on creating the author.");
+    }
 };
 
 const getAll = (request, response) => {
-    Author.getAll((error, data) => {
-        if (error) {
-            response
-                .statusCode(HttpStatusCode.INTERNAL_SERVER)
-                .send(error.message || "Some error occurred on retrieving authors.");
-        } else {
-            response.ok(data);
-        }
-    });
+    try {
+        const resources = await Author.getAll();
+        response.ok(resources);
+    } catch (error) {
+        response
+            .statusCode(HttpStatusCode.INTERNAL_SERVER)
+            .send(error.message || "Some error occurred on retrieving authors.");
+    }
 };
 
 const get = (request, response) => {
-    // const id = request.url
-    Author.getById(id, (error, data) => {
-        if (error) {
-            if (error.reason === "not_found") {
-                response.statusCode(HttpStatusCode.NOT_FOUND).send(`No author with id ${request.params.authorId}.`);
-            } else {
-                response
-                    .statusCode(HttpStatusCode.INTERNAL_SERVER)
-                    .send("Error retrieving author with id " + request.params.authorId);
-            }
+    try {
+        // const id = request.url
+        const resource = await Author.getById(id);
+        response.ok(resource);
+    } catch (error) {
+        if (error.reason === "not_found") {
+            response.statusCode(HttpStatusCode.NOT_FOUND).send(`No author with id ${request.params.authorId}.`);
         } else {
-            response.ok(data);
+            response
+                .statusCode(HttpStatusCode.INTERNAL_SERVER)
+                .send("Error retrieving author with id " + request.params.authorId);
         }
-    });
+    }
 };
 
 module.exports = { create, get, getAll };
