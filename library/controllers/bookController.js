@@ -17,7 +17,10 @@ const create = (request, response) => {
                 .statusCode(HttpStatusCode.INTERNAL_SERVER)
                 .send(error.message || "Some error occurred on creating the book.");
         } else {
-            response.send(data);
+            // TODO: add location
+            const location = "";
+            response.created(location, data);
+            response.created(data);
         }
     });
 };
@@ -29,7 +32,7 @@ const getAll = (request, response) => {
                 .statusCode(HttpStatusCode.INTERNAL_SERVER)
                 .send(error.message || "Some error occurred on retrieving books.");
         } else {
-            response.send(data);
+            response.ok(data);
         }
     });
 };
@@ -46,7 +49,7 @@ const get = (request, response) => {
                     .send("Error retrieving book with id " + request.params.bookId);
             }
         } else {
-            response.send(data);
+            response.ok(data);
         }
     });
 };

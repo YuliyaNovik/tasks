@@ -39,8 +39,11 @@ class Response {
         this.statusCode(HttpStatusCode.OK).header("Content-Type", "application/json").end(data);
     }
 
-    created(data) {
-        this.statusCode(HttpStatusCode.CREATED).header("Content-Type", "application/json").end(data);
+    created(location, data) {
+        this.statusCode(HttpStatusCode.CREATED)
+            .header("Location", location)
+            .header("Content-Type", "application/json")
+            .end(data);
     }
 }
 
