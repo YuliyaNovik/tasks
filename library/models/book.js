@@ -25,7 +25,7 @@ const create = (newBook, callback) => {
 };
 
 const getById = (id, callback) => {
-    connection.query(`SELECT * FROM book WHERE id = ${id}`, (error, res) => {
+    connection.query(`SELECT book.id, book.name, book.annotation, book.author as author, original.author as originalAuthor, original.name as originalName, book.indoor_access as indoorAccess FROM (SELECT * from book_view WHERE book_view.id = ${id}) as book LEFT JOIN book_view original on book.original_id = original.id;`, (error, res) => {
         if (error) {
             console.log("Error: ", error);
             callback(error, null);
