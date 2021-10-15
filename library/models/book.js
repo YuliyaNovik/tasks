@@ -1,4 +1,4 @@
-const { connection } = require("../utils/db.js");
+const { connectionPromise } = require("../utils/db.js");
 
 const Book = (book) => {
     this.id = book.id;
@@ -11,7 +11,7 @@ const Book = (book) => {
     this.language = book.language;
 };
 
-const create = (newBook, callback) => {
+const create = async (newBook, callback) => {
     connection.query("INSERT INTO books SET ?", newBook, (error, res) => {
         if (error) {
             console.log("Error: ", error);
@@ -24,38 +24,40 @@ const create = (newBook, callback) => {
     });
 };
 
-const getById = (id, callback) => {
-    connection.query(`SELECT book.id, book.name, book.annotation, book.author as author, original.author as originalAuthor, original.name as originalName, book.indoor_access as indoorAccess FROM (SELECT * from book_view WHERE book_view.id = ${id}) as book LEFT JOIN book_view original on book.original_id = original.id;`, (error, res) => {
-        if (error) {
-            console.log("Error: ", error);
-            callback(error, null);
-            return;
-        }
+const deleteById = async (id) => {
+    try {
+        const connection = await connectionPromise;
+        const [rows, fields] = await connection.query(`DELETE FROM book WHERE id = ${id};`);
+        console.log("Deleted book: ", id);
+    } catch (error) {
+        console.log("Error: ", error);
+        throw new Error({reason: "Error in sql query"});
+    }
+}
 
-        if (res.length > 0) {
-            console.log("Found book: ", res[0]);
-            callback(null, res[0]);
-            return;
-        }
-
-        callback({ reason: "not_found" }, null);
-    });
+const getById = async (id) => {
+    try {
+        const connection = await connectionPromise;
+        const [rows, fields] = await connection.query(`SELECT book.id, book.name, book.annotation, book.author as author, original.author as originalAuthor, original.name as originalName, book.indoor_access as indoorAccess FROM (SELECT * from book_view WHERE book_view.id = ${id}) as book LEFT JOIN book_view original on book.original_id = original.id;`);
+        const resource = rows[0];
+        console.log("Found book: ", resource);
+        return resource;
+    } catch (error) {
+        console.log("Error: ", error);
+        throw new Error({ reason: "not_found" });
+    }
 };
 
-const getAll = (callback) => {
-    connection.query(
-        "SELECT book.id, book.name, book.annotation, book.author as author, original.author as originalAuthor, original.name as originalName, book.indoor_access as indoorAccess FROM book_view book LEFT JOIN book_view original on book.original_id = original.id;",
-        (error, res) => {
-            if (error) {
-                console.log("Error: ", error);
-                callback(null, error);
-                return;
-            }
-
-            console.log("Books: ", res);
-            callback(null, res);
-        }
-    );
+const getAll = async () => {
+    try {
+        const connection = await connectionPromise;
+        const [rows, fields] = await connection.query(`SELECT book.id, book.name, book.annotation, book.author as author, original.author as originalAuthor, original.name as originalName, book.indoor_access as indoorAccess FROM book_view book LEFT JOIN book_view original on book.original_id = original.id;`);
+        console.log("Books book: ", rows);
+        return rows;
+    } catch (error) {
+        console.log("Error: ", error);
+        throw new Error({ reason: "not_found" });
+    }
 };
 
-module.exports = { create, getById, getAll };
+module.exports = { create, getById, getAll, deleteById };

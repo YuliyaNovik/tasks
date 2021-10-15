@@ -1,12 +1,7 @@
-const mysql = require("mysql");
+const mysql = require("mysql2/promise");
 const dbConfig = require("../dbConfig.json");
 
 dbConfig.password = process.env.DB_PASSWORD;
-const connection = mysql.createConnection(dbConfig);
+const connectionPromise = mysql.createConnection(dbConfig);
 
-connection.connect((error) => {
-    if (error) throw error;
-    console.log("Successfully connected to the database.");
-});
-
-module.exports = { connection };
+module.exports = { connectionPromise };
