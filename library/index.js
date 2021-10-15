@@ -1,8 +1,8 @@
-const Book = require("./models/book");
-const Author = require("./models/author");
-const { Server } = require("./server");
-const { getBookRouter } = require("./routes/bookRouter");
-const { getAuthorRouter } = require("./routes/authorRouter");
+const Book = require("./src/models/book");
+const Author = require("./src/models/author");
+const { Server } = require("./src/server");
+const { getBookRouter } = require("./src/routes/book.router");
+const { getAuthorRouter } = require("./src/routes/author.router");
 
 const hostName = "127.0.0.1";
 const PORT = process.env.PORT || 3000;
