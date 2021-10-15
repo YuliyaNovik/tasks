@@ -1,9 +1,9 @@
-DROP TABLE IF EXISTS copy_user, book_genre, user, role,
-    copy, book, genre, author_name, language, author;
-
-CREATE TABLE IF NOT EXISTS author(id int AUTO_INCREMENT NOT NULL, country NVARCHAR(64) NOT NULL, PRIMARY KEY(id));
+DROP TABLE IF EXISTS book_view, copy_user, book_genre, user, role,
+    copy, book, genre, author_name, author, language;
 
 CREATE TABLE IF NOT EXISTS language(id int AUTO_INCREMENT NOT NULL, lang_key VARCHAR(16) NOT NULL, name NVARCHAR(64) NOT NULL, PRIMARY KEY(id));
+
+CREATE TABLE IF NOT EXISTS author(id int AUTO_INCREMENT NOT NULL, language_id int NOT NULL, country NVARCHAR(64) NOT NULL, PRIMARY KEY(id), FOREIGN KEY (language_id) REFERENCES language(id) ON DELETE CASCADE ON UPDATE CASCADE);
 
 CREATE TABLE IF NOT EXISTS author_name(id int AUTO_INCREMENT NOT NULL, author_id int NOT NULL, language_id int NOT NULL, name NVARCHAR(512) NOT NULL, PRIMARY KEY(id), FOREIGN KEY (author_id) REFERENCES author(id) ON DELETE CASCADE ON UPDATE CASCADE, FOREIGN KEY (language_id) REFERENCES language(id) ON DELETE CASCADE ON UPDATE CASCADE);
 
@@ -34,10 +34,10 @@ CREATE VIEW book_view AS
     INNER JOIN author_name an ON book.author_id = an.author_id
     AND book.language_id = an.language_id;
 
-INSERT INTO librarydb.author (country) VALUES ('USA');
 INSERT INTO librarydb.language (lang_key, name) VALUES ('en', 'English'),
                                                        ('ru', 'Русский'),
                                                        ('be', 'Беларуская');
+INSERT INTO librarydb.author (language_id, country) VALUES (1, 'USA');
 INSERT INTO librarydb.author_name (language_id, author_id, name) VALUES (1, 1, 'Jack London'),
                                                                         (2, 1, 'Джек Лондон'),
                                                                         (3, 1, 'Джэк Лондан');
