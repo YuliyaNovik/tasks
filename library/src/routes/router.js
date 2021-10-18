@@ -15,6 +15,14 @@ class Router {
         this._route("DELETE", url, callback);
     }
 
+    compareURL(routeURL, requestURL) {
+        if (routeURL.test) {
+            return routeURL.test(requestURL);
+        }
+
+        return routeURL === requestURL;
+    }
+
     _route(method, url, callback) {
         this.routes.push({
             url,
@@ -27,6 +35,7 @@ class Router {
 class ResourceRouter extends Router {
     constructor(resourceKey, controller) {
         super();
+        this.resourceKey = resourceKey;
         this.get(`/${resourceKey}`, async (request, response) => {
             await controller.getAll(request, response);
         });
