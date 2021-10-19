@@ -33,28 +33,61 @@ class Router {
 }
 
 class ResourceRouter extends Router {
-    constructor(resourceKey, controller) {
+    constructor(resourceKey, controller, nestedRouters) {
         super();
         this.resourceKey = resourceKey;
-        this.get(`/${resourceKey}`, async (request, response) => {
+        this.initDefaultRoutes(controller);
+        this.registerNestedRouters(nestedRouters);
+    }
+
+    initDefaultRoutes(controller) {
+        this.get(`/${this.resourceKey}`, async (request, response) => {
             await controller.getAll(request, response);
         });
-    
-        this.post(`/${resourceKey}`, async (request, response) => {
+
+        this.post(`/${this.resourceKey}`, async (request, response) => {
             await controller.create(request, response);
         });
 
-        const uri = new RegExp(`^/${resourceKey}/[1-9]\d*$`);
-    
+        const uri = new RegExp(`^/${this.resourceKey}/[1-9]\d*$`);
+
         this.get(uri, async (request, response) => {
-            request.id = request.url.split(`/${resourceKey}/`)[1];
+            request.id = request.url.split(`/${this.resourceKey}/`)[1];
             await controller.get(request, response);
         });
-    
+
         this.delete(uri, async (request, response) => {
-            request.id = request.url.split(`/${resourceKey}/`)[1];
+            request.id = request.url.split(`/${this.resourceKey}/`)[1];
             await controller.deleteById(request, response);
         });
+    }
+
+    registerNestedRouters(nestedRouters) {
+        if (!nestedRouters) {
+            return;
+        }
+        for (const nestedRouter of nestedRouters) {
+            const nestedResourceKey = nestedRouter.resourceKey;
+            const nestedResourceUrl = new RegExp(`^/${this.resourceKey}/[1-9]\d*/${nestedResourceKey}`);
+
+            // TODO: check method
+            this.get(nestedResourceUrl, async (request, response) => {
+                request.primaryParams = {
+                    userId: request.url.split(`/${this.resourceKey}/`)[1],
+                };
+
+                const newUrl = "/" + nestedResourceKey + request.url.split(nestedResourceKey)[1];
+                const route = nestedRouter.routes.find(
+                    (route) => this.compareURL(route.url, newUrl) && route.method === request.method
+                );
+
+                if (route) {
+                    route.callback(request, response);
+                } else {
+                    // TODO: error
+                }
+            });
+        }
     }
 }
 
