@@ -15,11 +15,11 @@ process.on("uncaughtException", function (err) {
 
 const main = async () => {
     const server = new Server(PORT, hostName);
-    server.addRouter(getBookRouter());
-    server.addRouter(getAuthorRouter());
+    server.use("/books", getBookRouter());
+    server.use("/authors", getAuthorRouter());
     const fineRouter = getFineRouter();
-    server.addRouter(fineRouter);
-    server.addRouter(getUserRouter([fineRouter]));
+    server.use("/fines", fineRouter);
+    server.use("/user/:userId/fines", fineRouter);
 };
 
 main();

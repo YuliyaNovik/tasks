@@ -1,28 +1,26 @@
 const http = require("http");
+const { Request } = require("./utils/request");
 const { Response } = require("./utils/response");
 
 class Server {
     constructor(port, hostName) {
-        this.routers = [];
-        this.clients = [];
+        this.routers = new Map();
 
-        this._server = http.createServer(async (request, response) => {
-            request.url = decodeURIComponent(request.url);
+        this._server = http.createServer(async (req, res) => {
+            const request = new Request(req);
+            const response = new Response(res);
 
-            const route = this.routers
-                .map((router) => router.routes)
-                .flat()
-                .find((route) => this._compareURL(route.url, request.url) && route.method === request.method);
+            const router = this._findRouter(req.url);
 
-            const responseWrapper = new Response(response);
-            if (route) {
-                route.callback(request, responseWrapper);
+            if (!router) {
+                response.notFound(request.url);
                 return;
             }
+            router.navigate(request, response);
         });
 
         this._server.on("clientError", function onClientError(err, socket) {
-            if (err.code === 'ECONNRESET' || !socket.writable) {
+            if (err.code === "ECONNRESET" || !socket.writable) {
                 return;
             }
             console.log("clientError", err);
@@ -34,10 +32,20 @@ class Server {
         });
     }
 
-    addRouter(router) {
-        this.routers.push(router);
+    use(url, router) {
+        this.routers.set(url, router);
     }
 
+    _findRouter(url) {
+        for (const routeKey of this.routers.keys()) {
+            if (this._compareURL(routeKey, url)) {
+                return this.routers.get(routeKey);
+            }
+        }
+        return;
+    }
+
+    // check :
     _compareURL(routeURL, requestURL) {
         if (routeURL.test) {
             return routeURL.test(requestURL);

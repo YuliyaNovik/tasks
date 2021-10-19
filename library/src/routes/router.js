@@ -3,6 +3,14 @@ class Router {
         this.routes = [];
     }
 
+    navigate(request, response) {
+        const route = this._findRoute(request.url, request.method);
+        if (!route) {
+            throw new Error("Route is undefined");
+        }
+        route.callback(request, response);
+    }
+
     get(url, callback) {
         this._route("GET", url, callback);
     }
@@ -29,6 +37,10 @@ class Router {
             callback,
             method,
         });
+    }
+
+    _findRoute(url, method) {
+        return this.routes.find((route) => route.url === url && route.method === method);
     }
 }
 
