@@ -8,10 +8,10 @@ class BookController {
             return;
         }
 
-        const book = new Book({
+        const book = {
             author: request.body.author,
             name: request.body.name,
-        });
+        };
 
         try {
             const resource = await Book.create(book);

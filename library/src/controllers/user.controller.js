@@ -9,11 +9,11 @@ class UserController {
             return;
         }
 
-        const user = new User({
+        const user = {
             firstName: request.body.firstName,
             lastName: request.body.lastName,
             address: request.body.address,
-        });
+        };
 
         try {
             const resource = await User.create(user);
