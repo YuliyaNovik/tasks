@@ -18,7 +18,7 @@ class AuthorController {
             const resource = await Author.create(author);
             // TODO: add location
             const location = "";
-            response.created(location, resource);
+            response.created(location, JSON.stringify(resource));
         } catch (error) {
             response.internalServerError(error.message || "Some error occurred on creating the author.");
         }

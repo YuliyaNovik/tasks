@@ -1,7 +1,8 @@
 class Request {
     constructor(request) {
         this._request = request;
-        this._request.url = decodeURIComponent(request.url)
+        this._request.url = decodeURIComponent(request.url);
+        this.subscribeOnBody();
     }
 
     get url() {
@@ -13,7 +14,7 @@ class Request {
     }
 
     get body() {
-        return this._request.body;
+        return this._body;
     }
 
     initParams(templateUrl) {
@@ -26,10 +27,20 @@ class Request {
             const part = templateParts[i];
             if (part.length > 0 && part.startsWith(":")) {
                 const parsedId = Number.parseInt(urlParts[i], 10);
-                this.params[part.slice(1)] = Number.isNaN(parsedId)? urlParts[i] : parsedId;
+                this.params[part.slice(1)] = Number.isNaN(parsedId) ? urlParts[i] : parsedId;
             }
         }
     }
+
+    subscribeOnBody() {
+        let body = "";
+        this._request.on('data', chunk => {
+            body += chunk;
+        });
+        this._request.on('end', () => {
+            this._body = JSON.parse(body);
+        });
+    }
 }
 
-module.exports = { Request };
+module.exports = {Request};

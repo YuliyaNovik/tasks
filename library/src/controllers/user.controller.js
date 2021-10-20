@@ -19,7 +19,7 @@ class UserController {
             const resource = await User.create(user);
             // TODO: add location
             const location = "";
-            response.created(location, resource);
+            response.created(location, JSON.stringify(resource));
         } catch (error) {
             response.internalServerError(error.message || "Some error occurred on creating the user.");
         }
@@ -75,7 +75,7 @@ class UserController {
             const resource = await UserFine.create(userFine);
             // TODO: add location
             const location = "";
-            response.created(location, resource);
+            response.created(location, JSON.stringify(resource));
         } catch (error) {
             response.internalServerError(error.message || "Some error occurred on creating the user.");
         }
