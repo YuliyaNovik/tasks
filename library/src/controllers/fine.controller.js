@@ -1,6 +1,7 @@
 const Fine = require("../models/fine");
 const {HttpStatusCode} = require("../utils/httpStatusCode");
 const UserFine = require("../models/userFine");
+const {getLocationValue} = require("../utils/location");
 
 class FineController {
     async createUserFine(request, response) {
@@ -22,9 +23,7 @@ class FineController {
 
         try {
             const resource = await UserFine.create(userFine);
-            // TODO: add location
-            const location = "";
-            response.created(location, JSON.stringify(resource));
+            response.created(getLocationValue(request.url, resource.id), JSON.stringify(resource));
         } catch (error) {
             response.internalServerError(error.message || "Some error occurred on creating the user.");
         }

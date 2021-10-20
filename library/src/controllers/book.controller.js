@@ -1,5 +1,6 @@
 const Book = require("../models/book");
 const { HttpStatusCode } = require("../utils/httpStatusCode");
+const {getLocationValue} = require("../utils/location");
 
 class BookController {
     async create(request, response) {
@@ -15,9 +16,7 @@ class BookController {
 
         try {
             const resource = await Book.create(book);
-            // TODO: add location
-            const location = "";
-            response.created(location, JSON.stringify(resource));
+            response.created(getLocationValue(request.url, resource.id), JSON.stringify(resource));
         } catch (error) {
             response.internalServerError(error.message || "Some error occurred on creating the book.");
         }

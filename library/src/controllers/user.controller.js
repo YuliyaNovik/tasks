@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const UserFine = require("../models/userFine");
 const {HttpStatusCode} = require("../utils/httpStatusCode");
+const {getLocationValue} = require("../utils/location");
 
 class UserController {
     async create(request, response) {
@@ -17,9 +18,7 @@ class UserController {
 
         try {
             const resource = await User.create(user);
-            // TODO: add location
-            const location = "";
-            response.created(location, JSON.stringify(resource));
+            response.created(getLocationValue(request.url, resource.id), JSON.stringify(resource));
         } catch (error) {
             response.internalServerError(error.message || "Some error occurred on creating the user.");
         }
@@ -60,7 +59,7 @@ class UserController {
             return;
         }
 
-        if (!request.params || !request.params.userId || !request.params.id) {
+        if (!request.params || !request.params.userIdйј || !request.params.id) {
             response.statusCode(HttpStatusCode.BAD_REQUEST).send("Params userId and id cannot be empty!");
             return;
         }
@@ -73,9 +72,7 @@ class UserController {
 
         try {
             const resource = await UserFine.create(userFine);
-            // TODO: add location
-            const location = "";
-            response.created(location, JSON.stringify(resource));
+            response.created(getLocationValue(request.url, resource.id), JSON.stringify(resource));
         } catch (error) {
             response.internalServerError(error.message || "Some error occurred on creating the user.");
         }

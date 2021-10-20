@@ -1,5 +1,6 @@
 const Author = require("../models/author");
 const {HttpStatusCode} = require("../utils/httpStatusCode");
+const {getLocationValue} = require("../utils/location");
 
 class AuthorController {
     async create(request, response) {
@@ -16,9 +17,7 @@ class AuthorController {
 
         try {
             const resource = await Author.create(author);
-            // TODO: add location
-            const location = "";
-            response.created(location, JSON.stringify(resource));
+            response.created(getLocationValue(request.url, resource.id), JSON.stringify(resource));
         } catch (error) {
             response.internalServerError(error.message || "Some error occurred on creating the author.");
         }
