@@ -2,7 +2,6 @@ class Request {
     constructor(request) {
         this._request = request;
         this._request.url = decodeURIComponent(request.url);
-        this.subscribeOnBody();
     }
 
     get url() {
@@ -15,6 +14,21 @@ class Request {
 
     get body() {
         return this._body;
+    }
+
+    initBody() {
+        return new Promise((resolve) => {
+            let body = "";
+            if (this._request.headers["content-type"] === "application/json") {
+                this._request.on('data', chunk => {
+                    body += chunk;
+                });
+                this._request.on('end', () => {
+                    this._body = JSON.parse(body);
+                    resolve();
+                });
+            }
+        });
     }
 
     initParams(templateUrl) {
@@ -30,16 +44,6 @@ class Request {
                 this.params[part.slice(1)] = Number.isNaN(parsedId) ? urlParts[i] : parsedId;
             }
         }
-    }
-
-    subscribeOnBody() {
-        let body = "";
-        this._request.on('data', chunk => {
-            body += chunk;
-        });
-        this._request.on('end', () => {
-            this._body = JSON.parse(body);
-        });
     }
 }
 

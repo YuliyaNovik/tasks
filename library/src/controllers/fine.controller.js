@@ -4,6 +4,7 @@ const UserFine = require("../models/userFine");
 
 class FineController {
     async createUserFine(request, response) {
+        await request.initBody();
         if (!request.body) {
             response.statusCode(HttpStatusCode.BAD_REQUEST).send("Body cannot be empty!");
             return;

@@ -4,6 +4,7 @@ const {HttpStatusCode} = require("../utils/httpStatusCode");
 
 class UserController {
     async create(request, response) {
+        await request.initBody();
         if (!request.body) {
             response.statusCode(HttpStatusCode.BAD_REQUEST).send("Body cannot be empty!");
             return;
@@ -55,6 +56,7 @@ class UserController {
     }
 
     async createUserFine(request, response) {
+        await request.initBody();
         if (!request.body) {
             response.statusCode(HttpStatusCode.BAD_REQUEST).send("Body cannot be empty!");
             return;
