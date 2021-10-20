@@ -13,6 +13,10 @@ process.on("uncaughtException", function (err) {
 
 const main = async () => {
     const server = new Server(PORT, hostName);
+    server.addMiddleware(async (request, response, next) => {
+        await request.initBody();
+        next();
+    })
     server.use("/books", getBookRouter());
     server.use("/authors", getAuthorRouter());
     const userRouter = getUserRouter();
