@@ -21,12 +21,12 @@ const addNestedFines = (router, controller) => {
     const uri = new RegExp(`^/${router.resourceKey}/[1-9]\d*/users/[1-9]\d*$`);
 
     router.get(uri, async (request, response) => {
-        request.id = request.url.split(`/${router.resourceKey}/`)[1];
+        request.params.id = request.url.split(`/${router.resourceKey}/`)[1];
         await controller.getUserFine(request, response);
     });
 
     router.delete(uri, async (request, response) => {
-        request.id = request.url.split(`/${router.resourceKey}/`)[1];
+        request.params.id = request.url.split(`/${router.resourceKey}/`)[1];
         await controller.deleteUserFine(request, response);
     });
 }

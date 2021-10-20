@@ -38,14 +38,18 @@ class UserController {
     }
 
     async get(request, response) {
+        if (!request.params || !request.params.id) {
+            response.statusCode(HttpStatusCode.BAD_REQUEST).send("Param id cannot be empty!");
+            return;
+        }
         try {
-            const resource = await User.getById(request.id);
+            const resource = await User.getById(request.params.id);
             response.ok(JSON.stringify(resource));
         } catch (error) {
             if (error.reason === "not_found") {
-                response.statusCode(HttpStatusCode.NOT_FOUND).send(`No user with id ${request.params.userId}.`);
+                response.statusCode(HttpStatusCode.NOT_FOUND).send(`No user with id ${request.params.id}.`);
             } else {
-                response.internalServerError("Error retrieving user with id " + request.params.userId);
+                response.internalServerError("Error retrieving user with id " + request.params.id);
             }
         }
     }
@@ -63,7 +67,7 @@ class UserController {
 
         const userFine = {
             userId: request.params.userId,
-            fineId: request.body.fineId,
+            fineId: request.body.id,
             startDateTime: request.body.startDateTime
         };
 

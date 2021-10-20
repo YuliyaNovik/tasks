@@ -64,12 +64,12 @@ class ResourceRouter extends Router {
         const uri = new RegExp(`^/${this.resourceKey}/[1-9]\d*$`);
 
         this.get(uri, async (request, response) => {
-            request.id = request.url.split(`/${this.resourceKey}/`)[1];
+            request.params.id = request.url.split(`/${this.resourceKey}/`)[1];
             await controller.get(request, response);
         });
 
         this.delete(uri, async (request, response) => {
-            request.id = request.url.split(`/${this.resourceKey}/`)[1];
+            request.params.id = request.url.split(`/${this.resourceKey}/`)[1];
             await controller.deleteById(request, response);
         });
     }

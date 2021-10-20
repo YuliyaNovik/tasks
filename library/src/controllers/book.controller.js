@@ -35,14 +35,18 @@ class BookController {
     }
 
     async get(request, response) {
+        if (!request.params || !request.params.id) {
+            response.statusCode(HttpStatusCode.BAD_REQUEST).send("Param id cannot be empty!");
+            return;
+        }
         try {
-            const resource = await Book.getById(request.id);
+            const resource = await Book.getById(request.params.id);
             response.ok(JSON.stringify(resource));
         } catch (error) {
             if (error.reason === "not_found") {
-                response.statusCode(HttpStatusCode.NOT_FOUND).send(`No book with id ${request.params.bookId}.`);
+                response.statusCode(HttpStatusCode.NOT_FOUND).send(`No book with id ${request.params.id}.`);
             } else {
-                response.internalServerError("Error retrieving book with id " + request.params.bookId);
+                response.internalServerError("Error retrieving book with id " + request.params.id);
             }
         }
     }
