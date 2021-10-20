@@ -3,7 +3,6 @@ const {HttpStatusCode} = require("../utils/httpStatusCode");
 
 class AuthorController {
     async create(request, response) {
-        await request.initBody();
         if (!request.body) {
             response.statusCode(HttpStatusCode.BAD_REQUEST).send("Body cannot be empty!");
             return;

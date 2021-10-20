@@ -2,6 +2,7 @@ class Request {
     constructor(request) {
         this._request = request;
         this._request.url = decodeURIComponent(request.url);
+        this.ended = false;
     }
 
     get url() {
@@ -19,15 +20,17 @@ class Request {
     initBody() {
         return new Promise((resolve) => {
             let body = "";
-            if (this._request.headers["content-type"] === "application/json") {
-                this._request.on('data', chunk => {
-                    body += chunk;
-                });
-                this._request.on('end', () => {
+            this._request.on('data', chunk => {
+                body += chunk;
+            });
+            this._request.on('end', () => {
+                if (this._request.headers["content-type"] === "application/json") {
                     this._body = JSON.parse(body);
-                    resolve();
-                });
-            }
+                } else {
+                    this._body = body;
+                }
+                resolve(this);
+            });
         });
     }
 
