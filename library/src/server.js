@@ -1,6 +1,6 @@
 const http = require("http");
-const { Request } = require("./utils/request");
-const { Response } = require("./utils/response");
+const {Request} = require("./utils/request");
+const {Response} = require("./utils/response");
 
 class Server {
     constructor(port, hostName) {
@@ -10,13 +10,13 @@ class Server {
             const request = new Request(req);
             const response = new Response(res);
 
-            const router = this._findRouter(req.url);
-
-            if (!router) {
+            try {
+                const [templateUrl, router] = this._findRouterEntry(req.url);
+                router.navigate(templateUrl, request, response);
+            } catch (error) {
+                console.log(error);
                 response.notFound(request.url);
-                return;
             }
-            router.navigate(request, response);
         });
 
         this._server.on("clientError", function onClientError(err, socket) {
@@ -32,27 +32,47 @@ class Server {
         });
     }
 
-    use(url, router) {
-        this.routers.set(url, router);
+    use(route, router) {
+        if (this._isValidRoute(route)) {
+            this.routers.set(route, router);
+        } else {
+            throw new Error("Invalid route: " + route);
+        }
     }
 
-    _findRouter(url) {
-        for (const routeKey of this.routers.keys()) {
-            if (this._compareURL(routeKey, url)) {
-                return this.routers.get(routeKey);
+    _isValidRoute(route) {
+        return route && route.startsWith("/") && route.split("/").filter((part) => part).every((part) => {
+            return (part.length > 1 && part.startsWith(":")) || (part.length > 0 && !part.startsWith(":"))
+        });
+    }
+
+    _findRouterEntry(url) {
+        for (const entry of this.routers.entries()) {
+            if (this._compareURL(entry[0], url)) {
+                return entry;
             }
         }
-        return;
+        throw new Error("Cannot find router for: " + url);
     }
 
-    // check :
     _compareURL(routeURL, requestURL) {
-        if (routeURL.test) {
-            return routeURL.test(requestURL);
+        const urlParts = requestURL.split("/");
+        const templateParts = routeURL.split("/");
+
+        if (urlParts.length < templateParts.length || urlParts.length - templateParts.length > 1 ||
+            !requestURL.startsWith("/") || !routeURL.startsWith("/")) {
+            return false;
         }
 
-        return routeURL === requestURL;
+        for (let i = 1; i < templateParts.length; i++) {
+            const part = templateParts[i];
+            if (!(part.length > 0 && part.startsWith(":")) && part !== urlParts[i]) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
 
-module.exports = { Server };
+module.exports = {Server};

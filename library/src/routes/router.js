@@ -3,11 +3,12 @@ class Router {
         this.routes = [];
     }
 
-    navigate(request, response) {
+    navigate(templateUrl, request, response) {
         const route = this._findRoute(request.url, request.method);
         if (!route) {
             throw new Error("Route is undefined");
         }
+        request.initParams(templateUrl);
         route.callback(request, response);
     }
 
@@ -40,16 +41,15 @@ class Router {
     }
 
     _findRoute(url, method) {
-        return this.routes.find((route) => route.url === url && route.method === method);
+        return this.routes.find((route) => this.compareURL(route.url, url) && route.method === method);
     }
 }
 
 class ResourceRouter extends Router {
-    constructor(resourceKey, controller, nestedRouters) {
+    constructor(resourceKey, controller) {
         super();
         this.resourceKey = resourceKey;
         this.initDefaultRoutes(controller);
-        this.registerNestedRouters(nestedRouters);
     }
 
     initDefaultRoutes(controller) {
@@ -73,34 +73,6 @@ class ResourceRouter extends Router {
             await controller.deleteById(request, response);
         });
     }
-
-    registerNestedRouters(nestedRouters) {
-        if (!nestedRouters) {
-            return;
-        }
-        for (const nestedRouter of nestedRouters) {
-            const nestedResourceKey = nestedRouter.resourceKey;
-            const nestedResourceUrl = new RegExp(`^/${this.resourceKey}/[1-9]\d*/${nestedResourceKey}`);
-
-            // TODO: check method
-            this.get(nestedResourceUrl, async (request, response) => {
-                request.primaryParams = {
-                    userId: request.url.split(`/${this.resourceKey}/`)[1],
-                };
-
-                const newUrl = "/" + nestedResourceKey + request.url.split(nestedResourceKey)[1];
-                const route = nestedRouter.routes.find(
-                    (route) => this.compareURL(route.url, newUrl) && route.method === request.method
-                );
-
-                if (route) {
-                    route.callback(request, response);
-                } else {
-                    // TODO: error
-                }
-            });
-        }
-    }
 }
 
-module.exports = { Router, ResourceRouter };
+module.exports = {Router, ResourceRouter};
