@@ -11,17 +11,20 @@ const Book = (book) => {
     this.language = book.language;
 };
 
-const create = async (newBook, callback) => {
-    connection.query("INSERT INTO books SET ?", newBook, (error, res) => {
-        if (error) {
-            console.log("Error: ", error);
-            callback(error, null);
-            return;
-        }
-
-        console.log("Created book: ", { id: res.insertId, ...newBook });
-        callback(null, { id: res.insertId, ...newBook });
-    });
+const create = async (newBook) => {
+    try {
+        const connection = await connectionPromise;
+        // TODO: add query
+        const [rows, fields] = await connection.query(`INSERT INTO book () VALUES ?`, [
+            [[]],
+        ]);
+        const resource = { id: rows.insertId, ...newBook };
+        console.log("Created book: ", resource);
+        return resource;
+    } catch (error) {
+        console.log("Error: ", error);
+        throw new Error({ reason: "Error in sql query" });
+    }
 };
 
 const deleteById = async (id) => {
@@ -52,7 +55,7 @@ const getAll = async () => {
     try {
         const connection = await connectionPromise;
         const [rows, fields] = await connection.query(`SELECT book.id, book.name, book.annotation, book.author as author, original.author as originalAuthor, original.name as originalName, book.indoor_access as indoorAccess FROM book_view book LEFT JOIN book_view original on book.original_id = original.id;`);
-        console.log("Books book: ", rows);
+        console.log("Found books: ", rows);
         return rows;
     } catch (error) {
         console.log("Error: ", error);

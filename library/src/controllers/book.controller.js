@@ -5,6 +5,7 @@ class BookController {
     async create(request, response) {
         if (!request.body) {
             response.statusCode(HttpStatusCode.BAD_REQUEST).send("Body cannot be empty!");
+            return;
         }
 
         const book = new Book({

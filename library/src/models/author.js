@@ -67,7 +67,7 @@ const getAll = async () => {
         const [rows, fields] = await connection.query(
             `SELECT selected_author.id, selected_author.country, selected_author.language_id as languageId, an.name FROM (SELECT * FROM author WHERE author.id = 1) as selected_author INNER JOIN author_name an on selected_author.id = an.author_id AND selected_author.language_id = an.language_id;`
         );
-        console.log("Found author: ", rows);
+        console.log("Found authors: ", rows);
         return rows;
     } catch (error) {
         console.log("Error: ", error);
