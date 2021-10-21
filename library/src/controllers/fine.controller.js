@@ -5,8 +5,8 @@ const { getLocationValue } = require("../utils/location");
 
 class FineController {
     async createUserFine(request, response) {
-        if (!request.params || !request.params.fineId || !request.params.id) {
-            response.statusCode(HttpStatusCode.BAD_REQUEST).send("Params fineId and id cannot be empty!");
+        if (!request.params.fineId || !request.params.id) {
+            response.badRequest("Params fineId and id cannot be empty!");
             return;
         }
 
@@ -25,8 +25,8 @@ class FineController {
     }
 
     async deleteUserFine(request, response) {
-        if (!request.params || !request.params.fineId || !request.params.id) {
-            response.statusCode(HttpStatusCode.BAD_REQUEST).send("Params fineId and id cannot be empty!");
+        if (!request.params.fineId || !request.params.id) {
+            response.badRequest("Params fineId and id cannot be empty!");
             return;
         }
 
@@ -39,8 +39,8 @@ class FineController {
     }
 
     async getAllUserFines(request, response) {
-        if (!request.params || !request.params.fineId) {
-            response.statusCode(HttpStatusCode.BAD_REQUEST).send("Param fineId cannot be empty!");
+        if (!request.params.fineId) {
+            response.badRequest("Param fineId cannot be empty!");
             return;
         }
 
@@ -48,13 +48,13 @@ class FineController {
             const resources = await UserFine.getAllByFineId(request.params.fineId);
             response.ok(JSON.stringify(resources));
         } catch (error) {
-            response.internalServerError(error.message || "Some error occurred on retrieving user fines.");
+            response.internalServerError(`Cannot retrieve user fines with fineId ${request.params.fineId}`);
         }
     }
 
     async getUserFine(request, response) {
-        if (!request.params || !request.params.fineId || !request.params.id) {
-            response.statusCode(HttpStatusCode.BAD_REQUEST).send("Params fineId and id cannot be empty!");
+        if (!request.params.fineId || !request.params.id) {
+            response.badRequest("Params fineId and id cannot be empty!");
             return;
         }
 
@@ -64,11 +64,10 @@ class FineController {
         } catch (error) {
             if (error.reason === "not_found") {
                 response
-                    .statusCode(HttpStatusCode.NOT_FOUND)
-                    .send(`No user fine with userId ${request.params.id} and fineId ${request.params.fineId}.`);
+                    .notFound(`No user fine with userId ${request.params.id} and fineId ${request.params.fineId}.`);
             } else {
                 response.internalServerError(
-                    `Error retrieving user fine with userId ${request.params.id} and fineId ${request.params.fineId}.`
+                    `Cannot retrieve user fine with userId ${request.params.id} and fineId ${request.params.fineId}.`
                 );
             }
         }

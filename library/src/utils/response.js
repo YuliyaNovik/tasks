@@ -23,6 +23,10 @@ class Response {
         return this;
     }
 
+    badRequest(error) {
+        this.statusCode(HttpStatusCode.BAD_REQUEST).end(error);
+    }
+
     internalServerError(error) {
         this.statusCode(HttpStatusCode.INTERNAL_SERVER)
             .header("Content-Type", "text/plain")

@@ -1,5 +1,4 @@
 const Book = require("../models/book");
-const { HttpStatusCode } = require("../utils/httpStatusCode");
 const { getLocationValue } = require("../utils/location");
 
 class BookController {
@@ -29,8 +28,8 @@ class BookController {
     }
 
     async get(request, response) {
-        if (!request.params || !request.params.id) {
-            response.statusCode(HttpStatusCode.BAD_REQUEST).send("Param id cannot be empty!");
+        if (!request.params.id) {
+            response.badRequest("Param id cannot be empty!");
             return;
         }
         try {
@@ -38,7 +37,7 @@ class BookController {
             response.ok(JSON.stringify(resource));
         } catch (error) {
             if (error.reason === "not_found") {
-                response.statusCode(HttpStatusCode.NOT_FOUND).send(`No book with id ${request.params.id}.`);
+                response.notFound(`No book with id ${request.params.id}.`);
             } else {
                 response.internalServerError("Error retrieving book with id " + request.params.id);
             }

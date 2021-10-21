@@ -1,6 +1,5 @@
 const User = require("../models/user");
 const UserFine = require("../models/userFine");
-const { HttpStatusCode } = require("../utils/httpStatusCode");
 const { getLocationValue } = require("../utils/location");
 
 class UserController {
@@ -31,8 +30,8 @@ class UserController {
     }
 
     async get(request, response) {
-        if (!request.params || !request.params.id) {
-            response.statusCode(HttpStatusCode.BAD_REQUEST).send("Param id cannot be empty!");
+        if (!request.params.id) {
+            response.badRequest("Param id cannot be empty!");
             return;
         }
         try {
@@ -40,7 +39,7 @@ class UserController {
             response.ok(JSON.stringify(resource));
         } catch (error) {
             if (error.reason === "not_found") {
-                response.statusCode(HttpStatusCode.NOT_FOUND).send(`No user with id ${request.params.id}.`);
+                response.notFound(`No user with id ${request.params.id}.`);
             } else {
                 response.internalServerError("Error retrieving user with id " + request.params.id);
             }
@@ -48,13 +47,8 @@ class UserController {
     }
 
     async createUserFine(request, response) {
-        if (!request.body) {
-            response.statusCode(HttpStatusCode.BAD_REQUEST).send("Body cannot be empty!");
-            return;
-        }
-
-        if (!request.params || !request.params.userIdйј || !request.params.id) {
-            response.statusCode(HttpStatusCode.BAD_REQUEST).send("Params userId and id cannot be empty!");
+        if (!request.params.userId || !request.params.id) {
+            response.badRequest("Params userId and id cannot be empty!");
             return;
         }
 
@@ -73,8 +67,8 @@ class UserController {
     }
 
     async deleteUserFine(request, response) {
-        if (!request.params || !request.params.userId || !request.params.id) {
-            response.statusCode(HttpStatusCode.BAD_REQUEST).send("Params userId and id cannot be empty!");
+        if (!request.params.userId || !request.params.id) {
+            response.badRequest("Params userId and id cannot be empty!");
             return;
         }
 
@@ -87,8 +81,8 @@ class UserController {
     }
 
     async getAllUserFines(request, response) {
-        if (!request.params || !request.params.userId) {
-            response.statusCode(HttpStatusCode.BAD_REQUEST).send("Param userId cannot be empty!");
+        if (!request.params.userId) {
+            response.badRequest("Param userId cannot be empty!");
             return;
         }
 
@@ -96,13 +90,13 @@ class UserController {
             const resources = await UserFine.getAllByUserId(request.params.userId);
             response.ok(JSON.stringify(resources));
         } catch (error) {
-            response.internalServerError(error.message || "Some error occurred on retrieving user fines.");
+            response.internalServerError(`Cannot retrieve user fines with userId ${request.params.userId}`);
         }
     }
 
     async getUserFine(request, response) {
-        if (!request.params || !request.params.userId || !request.params.id) {
-            response.statusCode(HttpStatusCode.BAD_REQUEST).send("Params userId and id cannot be empty!");
+        if (!request.params.userId || !request.params.id) {
+            response.badRequest("Params userId and id cannot be empty!");
             return;
         }
 
@@ -111,12 +105,10 @@ class UserController {
             response.ok(JSON.stringify(resource));
         } catch (error) {
             if (error.reason === "not_found") {
-                response
-                    .statusCode(HttpStatusCode.NOT_FOUND)
-                    .send(`No user fine with userId ${request.params.userId} and fineId ${request.params.id}.`);
+                response.notFound(`No user fine with userId ${request.params.userId} and fineId ${request.params.id}.`);
             } else {
                 response.internalServerError(
-                    `Error retrieving user fine with userId ${request.params.userId} and fineId ${request.params.id}.`
+                    `Cannot retrieve user fine with userId ${request.params.userId} and fineId ${request.params.id}.`
                 );
             }
         }

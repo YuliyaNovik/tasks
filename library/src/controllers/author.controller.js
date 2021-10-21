@@ -1,5 +1,4 @@
 const Author = require("../models/author");
-const { HttpStatusCode } = require("../utils/httpStatusCode");
 const { getLocationValue } = require("../utils/location");
 
 class AuthorController {
@@ -19,8 +18,8 @@ class AuthorController {
     }
 
     async deleteById(request, response) {
-        if (!request.params || !request.params.id) {
-            response.statusCode(HttpStatusCode.BAD_REQUEST).send("Param id cannot be empty!");
+        if (!request.params.id) {
+            response.badRequest("Param id cannot be empty!");
         }
         try {
             await Author.deleteById(request.params.id);
@@ -42,8 +41,8 @@ class AuthorController {
     }
 
     async get(request, response) {
-        if (!request.params || !request.params.id) {
-            response.statusCode(HttpStatusCode.BAD_REQUEST).send("Param id cannot be empty!");
+        if (!request.params.id) {
+            response.badRequest("Param id cannot be empty!");
             return;
         }
         try {
@@ -51,7 +50,7 @@ class AuthorController {
             response.ok(JSON.stringify(resource));
         } catch (error) {
             if (error.reason === "not_found") {
-                response.statusCode(HttpStatusCode.NOT_FOUND).send(`No author with id ${request.params.id}.`);
+                response.notFound(`No author with id ${request.params.id}.`);
             } else {
                 response.internalServerError("Error retrieving author with id " + request.params.id);
             }
