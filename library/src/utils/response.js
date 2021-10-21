@@ -6,7 +6,7 @@ class Response {
     }
 
     send(value) {
-        this._response.end(value);
+        this._response.send(value);
     }
 
     end(value) {
