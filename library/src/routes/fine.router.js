@@ -10,23 +10,19 @@ const getFineRouter = () => {
 };
 
 const addNestedFines = (router, controller) => {
-    router.get(new RegExp(`^/${router.resourceKey}/[1-9]\\d*/users$`), async (request, response) => {
+    router.get(`/${router.resourceKey}/:fineId/users`, async (request, response) => {
         await controller.getAllUserFines(request, response);
     });
 
-    router.post(new RegExp(`^/${router.resourceKey}/[1-9]\\d*/users$`), async (request, response) => {
+    router.post(`/${router.resourceKey}/:fineId/users`, async (request, response) => {
         await controller.createUserFine(request, response);
     });
 
-    const uri = new RegExp(`^/${router.resourceKey}/[1-9]\\d*/users/[1-9]\\d*$`);
-
-    router.get(uri, async (request, response) => {
-        request.params.id = request.url.split(`/${router.resourceKey}/`)[1];
+    router.get(`/${router.resourceKey}/:fineId/users/:id`, async (request, response) => {
         await controller.getUserFine(request, response);
     });
 
-    router.delete(uri, async (request, response) => {
-        request.params.id = request.url.split(`/${router.resourceKey}/`)[1];
+    router.delete(`/${router.resourceKey}/:fineId/users/:id`, async (request, response) => {
         await controller.deleteUserFine(request, response);
     });
 };

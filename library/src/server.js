@@ -87,7 +87,7 @@ class Server extends RequestHandler {
 
         for (let i = 1; i < templateParts.length; i++) {
             const part = templateParts[i];
-            if (!(part.length > 0 && part.startsWith(":")) && part !== urlParts[i]) {
+            if (!(part.length > 1 && part.startsWith(":")) && part !== urlParts[i]) {
                 return false;
             }
         }

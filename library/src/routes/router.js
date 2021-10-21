@@ -1,4 +1,3 @@
-const { HttpStatusCode } = require("../utils/httpStatusCode");
 const { RequestHandler } = require("../utils/requestHandler");
 
 class Router extends RequestHandler {
@@ -13,7 +12,7 @@ class Router extends RequestHandler {
             console.log("Route is undefined");
             throw new Error({ reason: "not_found" });
         }
-        request.route = templateUrl;
+        request.route = route.url;
         if (!(await this._processMiddleware(request, response))) {
             console.log("Error in middleware");
             throw new Error({ reason: "bad_request" });
@@ -34,11 +33,21 @@ class Router extends RequestHandler {
     }
 
     compareURL(routeURL, requestURL) {
-        if (routeURL.test) {
-            return routeURL.test(requestURL);
+        const urlParts = requestURL.split("/");
+        const templateParts = routeURL.split("/");
+
+        if (urlParts.length !== templateParts.length) {
+            return false;
         }
 
-        return routeURL === requestURL;
+        for (let i = 1; i < templateParts.length; i++) {
+            const part = templateParts[i];
+            if (!(part.length > 1 && part.startsWith(":")) && part !== urlParts[i]) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     _route(method, url, callback) {
@@ -71,14 +80,12 @@ class ResourceRouter extends Router {
             await controller.create(request, response);
         });
 
-        const uri = new RegExp(`^/${this.resourceKey}/[1-9]\\d*$`);
-
-        this.get(uri, async (request, response) => {
+        this.get(`/${this.resourceKey}/:id`, async (request, response) => {
             request.params.id = request.url.split(`/${this.resourceKey}/`)[1];
             await controller.get(request, response);
         });
 
-        this.delete(uri, async (request, response) => {
+        this.delete(`/${this.resourceKey}/:id`, async (request, response) => {
             request.params.id = request.url.split(`/${this.resourceKey}/`)[1];
             await controller.deleteById(request, response);
         });
@@ -86,7 +93,7 @@ class ResourceRouter extends Router {
 
     initMiddlewares() {
         this.addMiddleware((request, response, next) => {
-            if (this.compareURL(new RegExp(`^/${this.resourceKey}`), request.url)) {
+            if (new RegExp(`^/${this.resourceKey}`).test(request.url)) {
                 next();
             } else {
                 console.log(`URL ${request.url} isn't supported by ${this.resourceKey} resource router`);
@@ -108,7 +115,7 @@ class ResourceRouter extends Router {
                 return;
             }
             if (!request.body) {
-                response.statusCode(HttpStatusCode.BAD_REQUEST).send("Body cannot be empty!");
+                response.badRequest("Body cannot be empty!");
             } else {
                 next();
             }
