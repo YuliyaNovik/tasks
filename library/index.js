@@ -19,7 +19,7 @@ const main = async () => {
             await request.initBody();
             next();
         } catch (error) {
-            response.statusCode(HttpStatusCode.BAD_REQUEST).send(error.message);
+            response.badRequest(error.message);
             console.log(error);
         }
     });
