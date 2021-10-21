@@ -1,11 +1,12 @@
 const http = require("http");
 const {Request} = require("./utils/request");
 const {Response} = require("./utils/response");
+const {RequestHandler} = require("./utils/requestHandler");
 
-class Server {
+class Server extends RequestHandler {
     constructor(port, hostName) {
+        super();
         this.routers = new Map();
-        this.middlewares = [];
 
         this._server = http.createServer(async (req, res) => {
             const request = new Request(req);
@@ -37,33 +38,12 @@ class Server {
         });
     }
 
-    async _processMiddleware(request, response) {
-        for (const middleware of this.middlewares) {
-            let isResolved = false;
-            const next = () => {
-                isResolved = true;
-            };
-
-            await middleware(request, response, next);
-
-            if (!isResolved) {
-                return false
-            }
-        }
-
-        return true;
-    }
-
     use(route, router) {
         if (this._isValidRoute(route)) {
             this.routers.set(route, router);
         } else {
             throw new Error("Invalid route: " + route);
         }
-    }
-
-    addMiddleware(middleware) {
-        this.middlewares.push(middleware);
     }
 
     _isValidRoute(route) {

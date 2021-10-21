@@ -1,9 +1,10 @@
 const {HttpStatusCode} = require("../utils/httpStatusCode");
+const {RequestHandler} = require("../utils/requestHandler");
 
-class Router {
+class Router extends RequestHandler {
     constructor() {
+        super();
         this.routes = [];
-        this.middlewares = [];
     }
 
     async navigate(templateUrl, request, response) {
@@ -37,27 +38,6 @@ class Router {
         }
 
         return routeURL === requestURL;
-    }
-
-    addMiddleware(middleware) {
-        this.middlewares.push(middleware);
-    }
-
-    async _processMiddleware(request, response) {
-        for (const middleware of this.middlewares) {
-            let isResolved = false;
-            const next = () => {
-                isResolved = true;
-            };
-
-            await middleware(request, response, next);
-
-            if (!isResolved) {
-                return false
-            }
-        }
-
-        return true;
     }
 
     _route(method, url, callback) {
