@@ -5,11 +5,6 @@ const {getLocationValue} = require("../utils/location");
 
 class FineController {
     async createUserFine(request, response) {
-        if (!request.body) {
-            response.statusCode(HttpStatusCode.BAD_REQUEST).send("Body cannot be empty!");
-            return;
-        }
-
         if (!request.params || !request.params.fineId || !request.params.id) {
             response.statusCode(HttpStatusCode.BAD_REQUEST).send("Params fineId and id cannot be empty!");
             return;

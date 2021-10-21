@@ -3,6 +3,7 @@ const {getBookRouter} = require("./src/routes/book.router");
 const {getAuthorRouter} = require("./src/routes/author.router");
 const {getFineRouter} = require("./src/routes/fine.router");
 const {getUserRouter} = require("./src/routes/user.router");
+const {HttpStatusCode} = require("./src/utils/httpStatusCode");
 
 const hostName = "127.0.0.1";
 const PORT = process.env.PORT || 3000;
@@ -14,8 +15,13 @@ process.on("uncaughtException", function (err) {
 const main = async () => {
     const server = new Server(PORT, hostName);
     server.addMiddleware(async (request, response, next) => {
-        await request.initBody();
-        next();
+        try {
+            await request.initBody();
+            next();
+        } catch (error) {
+            response.statusCode(HttpStatusCode.BAD_REQUEST).send(error.message);
+            console.log(error);
+        }
     })
     server.use("/books", getBookRouter());
     server.use("/authors", getAuthorRouter());

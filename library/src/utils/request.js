@@ -18,18 +18,24 @@ class Request {
     }
 
     initBody() {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             let body = "";
             this._request.on('data', chunk => {
                 body += chunk;
             });
             this._request.on('end', () => {
-                if (this._request.headers["content-type"] === "application/json") {
-                    this._body = JSON.parse(body);
-                } else {
+                if (this._request.headers["content-type"] !== "application/json") {
                     this._body = body;
+                    resolve(this);
+                    return;
                 }
-                resolve(this);
+
+                try {
+                    this._body = JSON.parse(body);
+                    resolve(this);
+                } catch (error) {
+                    reject(error);
+                }
             });
         });
     }

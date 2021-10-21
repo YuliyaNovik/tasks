@@ -17,7 +17,7 @@ class Server {
 
             try {
                 const [templateUrl, router] = this._findRouterEntry(request.url);
-                router.navigate(templateUrl, request, response);
+                await router.navigate(templateUrl, request, response);
             } catch (error) {
                 console.log(error);
                 response.notFound(request.url);

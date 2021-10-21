@@ -5,11 +5,6 @@ const {getLocationValue} = require("../utils/location");
 
 class UserController {
     async create(request, response) {
-        if (!request.body) {
-            response.statusCode(HttpStatusCode.BAD_REQUEST).send("Body cannot be empty!");
-            return;
-        }
-
         const user = {
             firstName: request.body.firstName,
             lastName: request.body.lastName,

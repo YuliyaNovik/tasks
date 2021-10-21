@@ -4,11 +4,6 @@ const {getLocationValue} = require("../utils/location");
 
 class AuthorController {
     async create(request, response) {
-        if (!request.body) {
-            response.statusCode(HttpStatusCode.BAD_REQUEST).send("Body cannot be empty!");
-            return;
-        }
-
         const author = {
             name: request.body.name,
             country: request.body.country,

@@ -1,9 +1,16 @@
+const {HttpStatusCode} = require("../utils/httpStatusCode");
+
 class Router {
     constructor() {
         this.routes = [];
+        this.middlewares = [];
     }
 
-    navigate(templateUrl, request, response) {
+    async navigate(templateUrl, request, response) {
+        if (!await this._processMiddleware(request, response)) {
+            throw new Error("Middleware error");
+        }
+
         const route = this._findRoute(request.url, request.method);
         if (!route) {
             throw new Error("Route is undefined");
@@ -32,6 +39,27 @@ class Router {
         return routeURL === requestURL;
     }
 
+    addMiddleware(middleware) {
+        this.middlewares.push(middleware);
+    }
+
+    async _processMiddleware(request, response) {
+        for (const middleware of this.middlewares) {
+            let isResolved = false;
+            const next = () => {
+                isResolved = true;
+            };
+
+            await middleware(request, response, next);
+
+            if (!isResolved) {
+                return false
+            }
+        }
+
+        return true;
+    }
+
     _route(method, url, callback) {
         this.routes.push({
             url,
@@ -50,6 +78,7 @@ class ResourceRouter extends Router {
         super();
         this.resourceKey = resourceKey;
         this.initDefaultRoutes(controller);
+        this.initMiddlewares();
     }
 
     initDefaultRoutes(controller) {
@@ -72,6 +101,28 @@ class ResourceRouter extends Router {
             request.params.id = request.url.split(`/${this.resourceKey}/`)[1];
             await controller.deleteById(request, response);
         });
+    }
+
+    initMiddlewares() {
+        this.addMiddleware((request, response, next) => {
+            if (this.compareURL(new RegExp(`^/${this.resourceKey}`), request.url)) {
+                next();
+            } else {
+                console.log(`URL ${request.url} isn't supported by ${this.resourceKey} resource router`)
+            }
+        })
+
+        this.addMiddleware((request, response, next) => {
+            if (request.method !== "POST") {
+                next();
+                return;
+            }
+            if (!request.body) {
+                response.statusCode(HttpStatusCode.BAD_REQUEST).send("Body cannot be empty!");
+            } else {
+                next();
+            }
+        })
     }
 }
 
