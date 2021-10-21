@@ -1,6 +1,6 @@
 const Book = require("../models/book");
 const { HttpStatusCode } = require("../utils/httpStatusCode");
-const {getLocationValue} = require("../utils/location");
+const { getLocationValue } = require("../utils/location");
 
 class BookController {
     async create(request, response) {

@@ -1,5 +1,5 @@
 {
-    "database": "librarydb",
-    "user": "admin",
-    "host": "localhost"
+  "database": "librarydb",
+  "user": "admin",
+  "host": "localhost"
 }

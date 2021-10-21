@@ -1,11 +1,11 @@
-const {ResourceRouter} = require("./router");
-const {FineController} = require("../controllers/fine.controller");
+const { ResourceRouter } = require("./router");
+const { FineController } = require("../controllers/fine.controller");
 
 const getFineRouter = () => {
     const resourceKey = "fines";
     const controller = new FineController();
     const router = new ResourceRouter(resourceKey, controller);
-    addNestedFines(router, controller)
+    addNestedFines(router, controller);
     return router;
 };
 
@@ -29,6 +29,6 @@ const addNestedFines = (router, controller) => {
         request.params.id = request.url.split(`/${router.resourceKey}/`)[1];
         await controller.deleteUserFine(request, response);
     });
-}
+};
 
-module.exports = {getFineRouter};
+module.exports = { getFineRouter };

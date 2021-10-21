@@ -9,15 +9,15 @@ class RequestHandler {
 
     async _processMiddleware(request, response) {
         for (const middleware of this.middlewares) {
-            let isResolved = false;
+            let isCalled = false;
             const next = () => {
-                isResolved = true;
+                isCalled = true;
             };
 
             await middleware(request, response, next);
 
-            if (!isResolved) {
-                return false
+            if (!isCalled) {
+                return false;
             }
         }
 
@@ -25,4 +25,4 @@ class RequestHandler {
     }
 }
 
-module.exports = {RequestHandler};
+module.exports = { RequestHandler };

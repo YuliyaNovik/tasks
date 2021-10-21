@@ -1,7 +1,7 @@
 const User = require("../models/user");
 const UserFine = require("../models/userFine");
-const {HttpStatusCode} = require("../utils/httpStatusCode");
-const {getLocationValue} = require("../utils/location");
+const { HttpStatusCode } = require("../utils/httpStatusCode");
+const { getLocationValue } = require("../utils/location");
 
 class UserController {
     async create(request, response) {
@@ -19,8 +19,7 @@ class UserController {
         }
     }
 
-    async deleteById() {
-    }
+    async deleteById() {}
 
     async getAll(request, response) {
         try {
@@ -62,7 +61,7 @@ class UserController {
         const userFine = {
             userId: request.params.userId,
             fineId: request.body.id,
-            startDateTime: request.body.startDateTime
+            startDateTime: request.body.startDateTime,
         };
 
         try {
@@ -112,12 +111,16 @@ class UserController {
             response.ok(JSON.stringify(resource));
         } catch (error) {
             if (error.reason === "not_found") {
-                response.statusCode(HttpStatusCode.NOT_FOUND).send(`No user fine with userId ${request.params.userId} and fineId ${request.params.id}.`);
+                response
+                    .statusCode(HttpStatusCode.NOT_FOUND)
+                    .send(`No user fine with userId ${request.params.userId} and fineId ${request.params.id}.`);
             } else {
-                response.internalServerError(`Error retrieving user fine with userId ${request.params.userId} and fineId ${request.params.id}.`);
+                response.internalServerError(
+                    `Error retrieving user fine with userId ${request.params.userId} and fineId ${request.params.id}.`
+                );
             }
         }
     }
 }
 
-module.exports = {UserController};
+module.exports = { UserController };

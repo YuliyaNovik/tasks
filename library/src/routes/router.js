@@ -1,5 +1,5 @@
-const {HttpStatusCode} = require("../utils/httpStatusCode");
-const {RequestHandler} = require("../utils/requestHandler");
+const { HttpStatusCode } = require("../utils/httpStatusCode");
+const { RequestHandler } = require("../utils/requestHandler");
 
 class Router extends RequestHandler {
     constructor() {
@@ -8,7 +8,7 @@ class Router extends RequestHandler {
     }
 
     async navigate(templateUrl, request, response) {
-        if (!await this._processMiddleware(request, response)) {
+        if (!(await this._processMiddleware(request, response))) {
             throw new Error("Middleware error");
         }
 
@@ -88,9 +88,9 @@ class ResourceRouter extends Router {
             if (this.compareURL(new RegExp(`^/${this.resourceKey}`), request.url)) {
                 next();
             } else {
-                console.log(`URL ${request.url} isn't supported by ${this.resourceKey} resource router`)
+                console.log(`URL ${request.url} isn't supported by ${this.resourceKey} resource router`);
             }
-        })
+        });
 
         this.addMiddleware((request, response, next) => {
             if (request.method !== "POST") {
@@ -102,8 +102,8 @@ class ResourceRouter extends Router {
             } else {
                 next();
             }
-        })
+        });
     }
 }
 
-module.exports = {Router, ResourceRouter};
+module.exports = { Router, ResourceRouter };

@@ -1,9 +1,9 @@
-const {Server} = require("./src/server");
-const {getBookRouter} = require("./src/routes/book.router");
-const {getAuthorRouter} = require("./src/routes/author.router");
-const {getFineRouter} = require("./src/routes/fine.router");
-const {getUserRouter} = require("./src/routes/user.router");
-const {HttpStatusCode} = require("./src/utils/httpStatusCode");
+const { Server } = require("./src/server");
+const { getBookRouter } = require("./src/routes/book.router");
+const { getAuthorRouter } = require("./src/routes/author.router");
+const { getFineRouter } = require("./src/routes/fine.router");
+const { getUserRouter } = require("./src/routes/user.router");
+const { HttpStatusCode } = require("./src/utils/httpStatusCode");
 
 const hostName = "127.0.0.1";
 const PORT = process.env.PORT || 3000;
@@ -22,7 +22,7 @@ const main = async () => {
             response.statusCode(HttpStatusCode.BAD_REQUEST).send(error.message);
             console.log(error);
         }
-    })
+    });
     server.use("/books", getBookRouter());
     server.use("/authors", getAuthorRouter());
     const userRouter = getUserRouter();

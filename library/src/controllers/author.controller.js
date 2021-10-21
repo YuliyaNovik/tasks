@@ -1,6 +1,6 @@
 const Author = require("../models/author");
-const {HttpStatusCode} = require("../utils/httpStatusCode");
-const {getLocationValue} = require("../utils/location");
+const { HttpStatusCode } = require("../utils/httpStatusCode");
+const { getLocationValue } = require("../utils/location");
 
 class AuthorController {
     async create(request, response) {
@@ -26,7 +26,9 @@ class AuthorController {
             await Author.deleteById(request.params.id);
             response.ok();
         } catch (error) {
-            response.internalServerError(error.message || `Some error occurred on deleting author with id ${request.params.id}.`);
+            response.internalServerError(
+                error.message || `Some error occurred on deleting author with id ${request.params.id}.`
+            );
         }
     }
 
@@ -57,4 +59,4 @@ class AuthorController {
     }
 }
 
-module.exports = {AuthorController};
+module.exports = { AuthorController };

@@ -1,5 +1,5 @@
-const {ResourceRouter} = require("./router");
-const {UserController} = require("../controllers/user.controller");
+const { ResourceRouter } = require("./router");
+const { UserController } = require("../controllers/user.controller");
 
 const getUserRouter = () => {
     const resourceKey = "users";
@@ -29,6 +29,6 @@ const addNestedFines = (router, controller) => {
         request.params.id = request.url.split(`/${router.resourceKey}/`)[1];
         await controller.deleteUserFine(request, response);
     });
-}
+};
 
-module.exports = {getUserRouter};
+module.exports = { getUserRouter };

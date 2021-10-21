@@ -4,9 +4,7 @@ const create = async (newUser) => {
     try {
         const connection = await connectionPromise;
         // TODO: add query
-        const [rows, fields] = await connection.query(`INSERT INTO fine () VALUES ?`, [
-            [[]],
-        ]);
+        const [rows, fields] = await connection.query(`INSERT INTO fine () VALUES ?`, [[[]]]);
         const resource = { id: rows.insertId, ...newUser };
         console.log("Created user: ", resource);
         return resource;
@@ -23,9 +21,9 @@ const deleteById = async (id) => {
         console.log("Deleted user: ", id);
     } catch (error) {
         console.log("Error: ", error);
-        throw new Error({reason: "Error in sql query"});
+        throw new Error({ reason: "Error in sql query" });
     }
-}
+};
 
 const getById = async (id) => {
     try {

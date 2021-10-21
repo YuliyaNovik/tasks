@@ -1,7 +1,7 @@
 const http = require("http");
-const {Request} = require("./utils/request");
-const {Response} = require("./utils/response");
-const {RequestHandler} = require("./utils/requestHandler");
+const { Request } = require("./utils/request");
+const { Response } = require("./utils/response");
+const { RequestHandler } = require("./utils/requestHandler");
 
 class Server extends RequestHandler {
     constructor(port, hostName) {
@@ -12,7 +12,7 @@ class Server extends RequestHandler {
             const request = new Request(req);
             const response = new Response(res);
 
-            if (!await this._processMiddleware(request, response)) {
+            if (!(await this._processMiddleware(request, response))) {
                 return;
             }
 
@@ -47,9 +47,16 @@ class Server extends RequestHandler {
     }
 
     _isValidRoute(route) {
-        return route && route.startsWith("/") && route.split("/").filter((part) => part).every((part) => {
-            return (part.length > 1 && part.startsWith(":")) || (part.length > 0 && !part.startsWith(":"))
-        });
+        return (
+            route &&
+            route.startsWith("/") &&
+            route
+                .split("/")
+                .filter((part) => part)
+                .every((part) => {
+                    return (part.length > 1 && part.startsWith(":")) || (part.length > 0 && !part.startsWith(":"));
+                })
+        );
     }
 
     _findRouterEntry(url) {
@@ -65,8 +72,12 @@ class Server extends RequestHandler {
         const urlParts = requestURL.split("/");
         const templateParts = routeURL.split("/");
 
-        if (urlParts.length < templateParts.length || urlParts.length - templateParts.length > 1 ||
-            !requestURL.startsWith("/") || !routeURL.startsWith("/")) {
+        if (
+            urlParts.length < templateParts.length ||
+            urlParts.length - templateParts.length > 1 ||
+            !requestURL.startsWith("/") ||
+            !routeURL.startsWith("/")
+        ) {
             return false;
         }
 
@@ -81,4 +92,4 @@ class Server extends RequestHandler {
     }
 }
 
-module.exports = {Server};
+module.exports = { Server };
