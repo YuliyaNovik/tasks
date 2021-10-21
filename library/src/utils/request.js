@@ -16,6 +16,10 @@ class Request {
         return this._body;
     }
 
+    set route(route) {
+        this._route = route;
+    }
+
     initBody() {
         return new Promise((resolve, reject) => {
             let body = "";
@@ -39,11 +43,14 @@ class Request {
         });
     }
 
-    initParams(templateUrl) {
+    initParams() {
+        if (!this._route) {
+            throw new Error("Request route is undefined");
+        }
         this.params = {};
 
         const urlParts = this._request.url.split("/");
-        const templateParts = templateUrl.split("/");
+        const templateParts = this._route.split("/");
 
         for (let i = 1; i < templateParts.length; i++) {
             const part = templateParts[i];

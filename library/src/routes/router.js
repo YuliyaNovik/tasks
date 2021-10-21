@@ -8,15 +8,16 @@ class Router extends RequestHandler {
     }
 
     async navigate(templateUrl, request, response) {
-        if (!(await this._processMiddleware(request, response))) {
-            throw new Error("Middleware error");
-        }
-
         const route = this._findRoute(request.url, request.method);
         if (!route) {
-            throw new Error("Route is undefined");
+            console.log("Route is undefined");
+            throw new Error({ reason: "not_found" });
         }
-        request.initParams(templateUrl);
+        request.route = templateUrl;
+        if (!(await this._processMiddleware(request, response))) {
+            console.log("Error in middleware");
+            throw new Error({ reason: "bad_request" });
+        }
         route.callback(request, response);
     }
 
@@ -89,6 +90,15 @@ class ResourceRouter extends Router {
                 next();
             } else {
                 console.log(`URL ${request.url} isn't supported by ${this.resourceKey} resource router`);
+            }
+        });
+
+        this.addMiddleware((request, response, next) => {
+            try {
+                request.initParams();
+                next();
+            } catch (error) {
+                console.log(error);
             }
         });
 

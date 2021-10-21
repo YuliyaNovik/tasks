@@ -20,8 +20,11 @@ class Server extends RequestHandler {
                 const [templateUrl, router] = this._findRouterEntry(request.url);
                 await router.navigate(templateUrl, request, response);
             } catch (error) {
-                console.log(error);
-                response.notFound(request.url);
+                if (error.reason === "not_found") {
+                    response.notFound(request.url);
+                } else {
+                    response.internalServerError("Cannot process request to " + request.url);
+                }
             }
         });
 
@@ -65,7 +68,8 @@ class Server extends RequestHandler {
                 return entry;
             }
         }
-        throw new Error("Cannot find router for: " + url);
+        console.log("Cannot find router for: " + url);
+        throw new Error({ reason: "not_found" });
     }
 
     _compareURL(routeURL, requestURL) {
