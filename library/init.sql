@@ -1,4 +1,5 @@
-DROP TABLE IF EXISTS book_view, copy_user, book_genre, user, role,
+DROP VIEW IF EXISTS book_view;
+DROP TABLE IF EXISTS copy_user, book_genre, user_fine, fine, user, role,
     copy, book, genre, author_name, author, language;
 
 CREATE TABLE IF NOT EXISTS language(id int AUTO_INCREMENT NOT NULL, lang_key VARCHAR(16) NOT NULL, name NVARCHAR(64) NOT NULL, PRIMARY KEY(id));
@@ -19,7 +20,11 @@ CREATE TABLE IF NOT EXISTS role(id int AUTO_INCREMENT NOT NULL, name VARCHAR(64)
 
 CREATE TABLE IF NOT EXISTS user(id int AUTO_INCREMENT NOT NULL, role_id int NOT NULL, first_name NVARCHAR(256), last_name NVARCHAR(256), address NVARCHAR(256), PRIMARY KEY(id), FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE CASCADE ON UPDATE CASCADE);
 
-CREATE TABLE IF NOT EXISTS copy_user(id int AUTO_INCREMENT NOT NULL, copy_id int UNIQUE NOT NULL, user_id int NOT NULL, start_time datetime, PRIMARY KEY(id), FOREIGN KEY (copy_id) REFERENCES copy(id) ON DELETE CASCADE ON UPDATE CASCADE, FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE);
+CREATE TABLE IF NOT EXISTS copy_user(id int AUTO_INCREMENT NOT NULL, copy_id int UNIQUE NOT NULL, user_id int NOT NULL, start_date_time datetime, PRIMARY KEY(id), FOREIGN KEY (copy_id) REFERENCES copy(id) ON DELETE CASCADE ON UPDATE CASCADE, FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE);
+
+CREATE TABLE IF NOT EXISTS fine(id int AUTO_INCREMENT NOT NULL, period int NOT NULL, PRIMARY KEY(id));
+
+CREATE TABLE IF NOT EXISTS user_fine(id int AUTO_INCREMENT NOT NULL, fine_id int NOT NULL, user_id int NOT NULL, start_date_time datetime, PRIMARY KEY(id), FOREIGN KEY (fine_id) REFERENCES fine(id) ON DELETE CASCADE ON UPDATE CASCADE, FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE);
 
 CREATE VIEW book_view AS
   SELECT
@@ -45,3 +50,9 @@ INSERT INTO librarydb.book (author_id, name, language_id, annotation, original_i
 INSERT INTO librarydb.book (author_id, name, language_id, annotation, original_id, indoor_access) VALUES (1, 'Мартин Иден', 2, 'какой-то текст', 1, 0),
                                                                                                          (1, 'Марцін Ідэн', 3, 'неiкi тэкст', 1, 0);
 INSERT INTO librarydb.copy (book_id) VALUES (1), (1), (1), (2), (2), (2), (2), (3);
+
+INSERT INTO librarydb.role (name) VALUES ('admin'), ('follower');
+INSERT INTO librarydb.user (first_name, last_name, address, role_id) VALUES ('FirstName', 'LastName', 'Minsk, vulica Fabrycyjusa, 8B', 1);
+INSERT INTO librarydb.user (first_name, last_name, address, role_id) VALUES ('Follower', 'Smith', 'Minsk, vulica Fabrycyjusa, 8B', 2);
+
+INSERT INTO librarydb.fine (period) VALUES (20);
