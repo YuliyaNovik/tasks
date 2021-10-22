@@ -10,7 +10,7 @@ const create = async (newUserFine) => {
             [[[newUserFine.userId, newUserFine.fineId, toTimeStamp(newUserFine.startDateTime)]]]
         );
         const resource = { id: rows.insertId, ...newUserFine };
-        console.log("Created user fine: ", resource);
+        console.log("Created active fine: ", resource);
         return resource;
     } catch (error) {
         console.log("Error: ", error);
@@ -24,7 +24,7 @@ const deleteByUserIdAndFineId = async (userId, fineId) => {
         const [rows, fields] = await connection.query(
             `DELETE FROM user_fine WHERE user_id = ${userId} AND fine_id = ${fineId};`
         );
-        console.log(`Deleted user fines with userId ${userId} and fineId ${fineId}`);
+        console.log(`Deleted active fines with userId ${userId} and fineId ${fineId}`);
     } catch (error) {
         console.log("Error: ", error);
         throw new SpecifiedError({ reason: "Error in sql query" });
@@ -35,7 +35,7 @@ const deleteById = async (id) => {
     try {
         const connection = await connectionPromise;
         const [rows, fields] = await connection.query(`DELETE FROM user_fine WHERE id = ${id};`);
-        console.log(`Deleted user fine with id ${id}`);
+        console.log(`Deleted active fine with id ${id}`);
     } catch (error) {
         console.log("Error: ", error);
         throw new SpecifiedError({ reason: "Error in sql query" });
@@ -49,7 +49,7 @@ const getByUserIdAndFineId = async (userId, fineId) => {
             `SELECT * FROM user_fine WHERE user_id = ${userId} AND fine_id = ${fineId};`
         );
         const resource = rows;
-        console.log("Found user fines: ", resource);
+        console.log("Found active fines: ", resource);
         return resource;
     } catch (error) {
         console.log("Error: ", error);
@@ -91,7 +91,7 @@ const getById = async (id) => {
         console.log("Error: Resource is undefined");
         throw new SpecifiedError({ reason: "not_found" });
     }
-    console.log("Found user fine: ", resource);
+    console.log("Found active fine: ", resource);
     return resource;
 };
 
@@ -99,7 +99,7 @@ const getAll = async () => {
     try {
         const connection = await connectionPromise;
         const [rows, fields] = await connection.query(`SELECT * FROM user_fine;`);
-        console.log("Found user fines: ", rows);
+        console.log("Found active fines: ", rows);
         return rows;
     } catch (error) {
         console.log("Error: ", error);

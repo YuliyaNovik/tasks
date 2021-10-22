@@ -81,10 +81,10 @@ class FineController {
             response.ok(JSON.stringify(resources));
         } catch (error) {
             if (error.reason === "not_found") {
-                response.notFound(`No user fine with userId ${request.params.id} and fineId ${request.params.fineId}.`);
+                response.notFound(`No active fines with userId ${request.params.id} and fineId ${request.params.fineId}.`);
             } else {
                 response.internalServerError(
-                    `Cannot retrieve user fine with userId ${request.params.id} and fineId ${request.params.fineId}.`
+                    `Cannot retrieve active fine with userId ${request.params.id} and fineId ${request.params.fineId}.`
                 );
             }
         }

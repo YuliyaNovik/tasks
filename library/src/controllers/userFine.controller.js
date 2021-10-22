@@ -41,7 +41,7 @@ class UserFineController {
             const resources = await UserFine.getAll();
             response.ok(JSON.stringify(resources));
         } catch (error) {
-            response.internalServerError(`Cannot retrieve user fines with fineId ${request.params.fineId}`);
+            response.internalServerError(`Cannot retrieve active fines with fineId ${request.params.fineId}`);
         }
     }
 
@@ -56,9 +56,9 @@ class UserFineController {
             response.ok(JSON.stringify(resource));
         } catch (error) {
             if (error.reason === "not_found") {
-                response.notFound(`No user fine with id ${request.params.id}`);
+                response.notFound(`No active fine with id ${request.params.id}`);
             } else {
-                response.internalServerError(`Cannot retrieve user fine with id ${request.params.id}`);
+                response.internalServerError(`Cannot retrieve active fine with id ${request.params.id}`);
             }
         }
     }

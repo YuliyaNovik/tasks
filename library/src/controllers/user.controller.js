@@ -57,10 +57,10 @@ class UserController {
             response.ok(JSON.stringify(resources));
         } catch (error) {
             if (error.reason === "not_found") {
-                response.notFound(`No user fine with userId ${request.params.userId} and fineId ${request.params.id}.`);
+                response.notFound(`No active fines with userId ${request.params.userId} and fineId ${request.params.id}.`);
             } else {
                 response.internalServerError(
-                    `Cannot retrieve user fine with userId ${request.params.userId} and fineId ${request.params.id}.`
+                    `Cannot retrieve active fine with userId ${request.params.userId} and fineId ${request.params.id}.`
                 );
             }
         }
