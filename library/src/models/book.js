@@ -37,18 +37,16 @@ const deleteById = async (id) => {
 };
 
 const getById = async (id) => {
-    try {
-        const connection = await connectionPromise;
-        const [rows, fields] = await connection.query(
-            `SELECT book.id, book.name, book.annotation, book.author as author, original.author as originalAuthor, original.name as originalName, book.indoor_access as indoorAccess FROM (SELECT * from book_view WHERE book_view.id = ${id}) as book LEFT JOIN book_view original on book.original_id = original.id;`
-        );
-        const resource = rows[0];
-        console.log("Found book: ", resource);
-        return resource;
-    } catch (error) {
-        console.log("Error: ", error);
+    const connection = await connectionPromise;
+    const [rows, fields] = await connection.query(
+        `SELECT book.id, book.name, book.annotation, book.author as author, original.author as originalAuthor, original.name as originalName, book.indoor_access as indoorAccess FROM (SELECT * from book_view WHERE book_view.id = ${id}) as book LEFT JOIN book_view original on book.original_id = original.id;`
+    );
+    const resource = rows[0];
+    if (!resource) {
         throw new Error({ reason: "not_found" });
     }
+    console.log("Found book: ", resource);
+    return resource;
 };
 
 const getAll = async () => {

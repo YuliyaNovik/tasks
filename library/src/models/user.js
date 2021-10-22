@@ -26,16 +26,14 @@ const deleteById = async (id) => {
 };
 
 const getById = async (id) => {
-    try {
-        const connection = await connectionPromise;
-        const [rows, fields] = await connection.query(``);
-        const resource = rows[0];
-        console.log("Found user: ", resource);
-        return resource;
-    } catch (error) {
-        console.log("Error: ", error);
+    const connection = await connectionPromise;
+    const [rows, fields] = await connection.query(``);
+    const resource = rows[0];
+    if (!resource) {
         throw new Error({ reason: "not_found" });
     }
+    console.log("Found user: ", resource);
+    return resource;
 };
 
 const getAll = async () => {

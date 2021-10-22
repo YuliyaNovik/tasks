@@ -83,15 +83,15 @@ const getAllByFineId = async (fineId) => {
 };
 
 const getById = async (id) => {
-    try {
-        const connection = await connectionPromise;
-        const [rows, fields] = await connection.query(`SELECT * FROM user_fine WHERE id = ${id};`);
-        console.log("Found user fine: ", rows[0]);
-        return rows[0];
-    } catch (error) {
-        console.log("Error: ", error);
+    const connection = await connectionPromise;
+    const [rows, fields] = await connection.query(`SELECT * FROM user_fine WHERE id = ${id};`);
+    const resource = rows[0];
+    if (!resource) {
+        console.log("Error: Resource is undefined");
         throw new Error({ reason: "not_found" });
     }
+    console.log("Found user fine: ", resource);
+    return resource;
 };
 
 const getAll = async () => {
