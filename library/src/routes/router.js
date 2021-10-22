@@ -1,4 +1,5 @@
 const { RequestHandler } = require("../utils/requestHandler");
+const { SpecifiedError } = require("../utils/specifiedError");
 
 class Router extends RequestHandler {
     constructor() {
@@ -10,12 +11,12 @@ class Router extends RequestHandler {
         const route = this._findRoute(request.url, request.method);
         if (!route) {
             console.log("Route is undefined");
-            throw new Error({ reason: "not_found" });
+            throw new SpecifiedError({ reason: "not_found" });
         }
         request.route = route.url;
         if (!(await this._processMiddleware(request, response))) {
             console.log("Error in middleware");
-            throw new Error({ reason: "bad_request" });
+            throw new SpecifiedError({ reason: "bad_request" });
         }
         route.callback(request, response);
     }

@@ -1,5 +1,6 @@
 const { connectionPromise } = require("../utils/db.js");
 const { toTimeStamp } = require("../utils/dateTime");
+const { SpecifiedError } = require("../utils/specifiedError");
 
 const create = async (newUserFine) => {
     try {
@@ -13,7 +14,7 @@ const create = async (newUserFine) => {
         return resource;
     } catch (error) {
         console.log("Error: ", error);
-        throw new Error({ reason: "Error in sql query" });
+        throw new SpecifiedError({ reason: "Error in sql query" });
     }
 };
 
@@ -26,7 +27,7 @@ const deleteByUserIdAndFineId = async (userId, fineId) => {
         console.log(`Deleted user fines with userId ${userId} and fineId ${fineId}`);
     } catch (error) {
         console.log("Error: ", error);
-        throw new Error({ reason: "Error in sql query" });
+        throw new SpecifiedError({ reason: "Error in sql query" });
     }
 };
 
@@ -37,7 +38,7 @@ const deleteById = async (id) => {
         console.log(`Deleted user fine with id ${id}`);
     } catch (error) {
         console.log("Error: ", error);
-        throw new Error({ reason: "Error in sql query" });
+        throw new SpecifiedError({ reason: "Error in sql query" });
     }
 };
 
@@ -52,7 +53,7 @@ const getByUserIdAndFineId = async (userId, fineId) => {
         return resource;
     } catch (error) {
         console.log("Error: ", error);
-        throw new Error({ reason: "not_found" });
+        throw new SpecifiedError({ reason: "not_found" });
     }
 };
 
@@ -65,7 +66,7 @@ const getAllByUserId = async (userId) => {
         return rows;
     } catch (error) {
         console.log("Error: ", error);
-        throw new Error({ reason: "not_found" });
+        throw new SpecifiedError({ reason: "not_found" });
     }
 };
 
@@ -78,7 +79,7 @@ const getAllByFineId = async (fineId) => {
         return rows;
     } catch (error) {
         console.log("Error: ", error);
-        throw new Error({ reason: "not_found" });
+        throw new SpecifiedError({ reason: "not_found" });
     }
 };
 
@@ -88,7 +89,7 @@ const getById = async (id) => {
     const resource = rows[0];
     if (!resource) {
         console.log("Error: Resource is undefined");
-        throw new Error({ reason: "not_found" });
+        throw new SpecifiedError({ reason: "not_found" });
     }
     console.log("Found user fine: ", resource);
     return resource;
@@ -102,7 +103,7 @@ const getAll = async () => {
         return rows;
     } catch (error) {
         console.log("Error: ", error);
-        throw new Error({ reason: "not_found" });
+        throw new SpecifiedError({ reason: "not_found" });
     }
 };
 

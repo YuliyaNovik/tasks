@@ -1,4 +1,5 @@
 const { connectionPromise } = require("../utils/db.js");
+const { SpecifiedError } = require("../utils/specifiedError");
 
 const create = async (newFine) => {
     try {
@@ -9,7 +10,7 @@ const create = async (newFine) => {
         return resource;
     } catch (error) {
         console.log("Error: ", error);
-        throw new Error({ reason: "Error in sql query" });
+        throw new SpecifiedError({ reason: "Error in sql query" });
     }
 };
 
@@ -20,7 +21,7 @@ const deleteById = async (id) => {
         console.log("Deleted fine: ", id);
     } catch (error) {
         console.log("Error: ", error);
-        throw new Error({ reason: "Error in sql query" });
+        throw new SpecifiedError({ reason: "Error in sql query" });
     }
 };
 
@@ -29,7 +30,7 @@ const getById = async (id) => {
     const [rows, fields] = await connection.query(`SELECT * FROM fine WHERE id = ${id};`);
     const resource = rows[0];
     if (!resource) {
-        throw new Error({ reason: "not_found" });
+        throw new SpecifiedError({ reason: "not_found" });
     }
     console.log("Found fine: ", resource);
     return resource;
@@ -43,7 +44,7 @@ const getAll = async () => {
         return rows;
     } catch (error) {
         console.log("Error: ", error);
-        throw new Error({ reason: "not_found" });
+        throw new SpecifiedError({ reason: "not_found" });
     }
 };
 

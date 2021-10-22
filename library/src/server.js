@@ -2,6 +2,7 @@ const http = require("http");
 const { Request } = require("./utils/request");
 const { Response } = require("./utils/response");
 const { RequestHandler } = require("./utils/requestHandler");
+const { SpecifiedError } = require("./utils/specifiedError");
 
 class Server extends RequestHandler {
     constructor(port, hostName) {
@@ -69,7 +70,7 @@ class Server extends RequestHandler {
             }
         }
         console.log("Cannot find router for: " + url);
-        throw new Error({ reason: "not_found" });
+        throw new SpecifiedError({ reason: "not_found" });
     }
 
     _compareURL(routeURL, requestURL) {

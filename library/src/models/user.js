@@ -1,4 +1,5 @@
 const { connectionPromise } = require("../utils/db.js");
+const { SpecifiedError } = require("../utils/specifiedError");
 
 const create = async (newUser) => {
     try {
@@ -10,7 +11,7 @@ const create = async (newUser) => {
         return resource;
     } catch (error) {
         console.log("Error: ", error);
-        throw new Error({ reason: "Error in sql query" });
+        throw new SpecifiedError({ reason: "Error in sql query" });
     }
 };
 
@@ -21,7 +22,7 @@ const deleteById = async (id) => {
         console.log("Deleted user: ", id);
     } catch (error) {
         console.log("Error: ", error);
-        throw new Error({ reason: "Error in sql query" });
+        throw new SpecifiedError({ reason: "Error in sql query" });
     }
 };
 
@@ -30,7 +31,7 @@ const getById = async (id) => {
     const [rows, fields] = await connection.query(``);
     const resource = rows[0];
     if (!resource) {
-        throw new Error({ reason: "not_found" });
+        throw new SpecifiedError({ reason: "not_found" });
     }
     console.log("Found user: ", resource);
     return resource;
@@ -44,7 +45,7 @@ const getAll = async () => {
         return rows;
     } catch (error) {
         console.log("Error: ", error);
-        throw new Error({ reason: "not_found" });
+        throw new SpecifiedError({ reason: "not_found" });
     }
 };
 
