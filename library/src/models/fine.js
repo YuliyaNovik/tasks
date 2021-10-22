@@ -3,8 +3,7 @@ const { connectionPromise } = require("../utils/db.js");
 const create = async (newFine) => {
     try {
         const connection = await connectionPromise;
-        // TODO: add query
-        const [rows, fields] = await connection.query(`INSERT INTO fine () VALUES ?`, [[[]]]);
+        const [rows, fields] = await connection.query(`INSERT INTO fine (period) VALUES ?`, [[[newFine.period]]]);
         const resource = { id: rows.insertId, ...newFine };
         console.log("Created fine: ", resource);
         return resource;
@@ -17,7 +16,7 @@ const create = async (newFine) => {
 const deleteById = async (id) => {
     try {
         const connection = await connectionPromise;
-        const [rows, fields] = await connection.query(``);
+        const [rows, fields] = await connection.query(`DELETE FROM fine WHERE id = ${id};`);
         console.log("Deleted fine: ", id);
     } catch (error) {
         console.log("Error: ", error);
@@ -28,7 +27,7 @@ const deleteById = async (id) => {
 const getById = async (id) => {
     try {
         const connection = await connectionPromise;
-        const [rows, fields] = await connection.query(``);
+        const [rows, fields] = await connection.query(`SELECT * FROM fine WHERE id = ${id};`);
         const resource = rows[0];
         console.log("Found fine: ", resource);
         return resource;
@@ -41,7 +40,7 @@ const getById = async (id) => {
 const getAll = async () => {
     try {
         const connection = await connectionPromise;
-        const [rows, fields] = await connection.query(``);
+        const [rows, fields] = await connection.query(`SELECT * FROM fine;`);
         console.log("Found fines: ", rows);
         return rows;
     } catch (error) {
