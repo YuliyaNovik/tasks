@@ -1,13 +1,14 @@
 const { connectionPromise } = require("../utils/db.js");
+const { toTimeStamp } = require("../utils/dateTime");
 
 const create = async (newUserFine) => {
     try {
         const connection = await connectionPromise;
         const [rows, fields] = await connection.query(
             `INSERT INTO user_fine (user_id, fine_id, start_date_time) VALUES ?`,
-            [[[newUserFine.userId, newUserFine.fineId, newUserFine.startDateTime]]]
+            [[[newUserFine.userId, newUserFine.fineId, toTimeStamp(newUserFine.startDateTime)]]]
         );
-        const resource = { id: rows.insertId, ...newAuthor };
+        const resource = { id: rows.insertId, ...newUserFine };
         console.log("Created user fine: ", resource);
         return resource;
     } catch (error) {
@@ -46,7 +47,7 @@ const getByUserIdAndFineId = async (userId, fineId) => {
         const [rows, fields] = await connection.query(
             `SELECT * FROM user_fine WHERE user_id = ${userId} AND fine_id = ${fineId};`
         );
-        const resource = rows[0];
+        const resource = rows;
         console.log("Found user fines: ", resource);
         return resource;
     } catch (error) {

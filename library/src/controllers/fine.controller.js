@@ -55,7 +55,7 @@ class FineController {
             }
         }
     }
-    
+
     async deleteUserFine(request, response) {
         if (!request.params.fineId || !request.params.id) {
             response.badRequest("Params fineId and id cannot be empty!");
@@ -77,12 +77,11 @@ class FineController {
         }
 
         try {
-            const resource = await UserFine.getByUserIdAndFineId(request.params.fineId, request.params.id);
-            response.ok(JSON.stringify(resource));
+            const resources = await UserFine.getByUserIdAndFineId(request.params.fineId, request.params.id);
+            response.ok(JSON.stringify(resources));
         } catch (error) {
             if (error.reason === "not_found") {
-                response
-                    .notFound(`No user fine with userId ${request.params.id} and fineId ${request.params.fineId}.`);
+                response.notFound(`No user fine with userId ${request.params.id} and fineId ${request.params.fineId}.`);
             } else {
                 response.internalServerError(
                     `Cannot retrieve user fine with userId ${request.params.id} and fineId ${request.params.fineId}.`

@@ -2,7 +2,7 @@ const UserFine = require("../models/userFine");
 const { getLocationValue } = require("../utils/location");
 
 class UserFineController {
-    async createUserFine(request, response) {
+    async create(request, response) {
         if (!request.body.fineId || !request.body.userId) {
             response.badRequest("Body fields fineId and userId cannot be empty!");
             return;
@@ -11,7 +11,7 @@ class UserFineController {
         const userFine = {
             userId: request.body.userId,
             fineId: request.body.fineId,
-            startDateTime: Date.now(),
+            startDateTime: new Date(),
         };
 
         try {
@@ -22,9 +22,9 @@ class UserFineController {
         }
     }
 
-    async deleteUserFine(request, response) {
+    async deleteById(request, response) {
         if (!request.params.id) {
-            response.badRequest("Params fineId and id cannot be empty!");
+            response.badRequest("Param id cannot be empty!");
             return;
         }
 
@@ -36,16 +36,16 @@ class UserFineController {
         }
     }
 
-    async getAllUserFines(request, response) {
+    async getAll(request, response) {
         try {
-            const resources = await UserFine.getAll(request.params.fineId);
+            const resources = await UserFine.getAll();
             response.ok(JSON.stringify(resources));
         } catch (error) {
             response.internalServerError(`Cannot retrieve user fines with fineId ${request.params.fineId}`);
         }
     }
 
-    async getUserFine(request, response) {
+    async get(request, response) {
         if (!request.params.id) {
             response.badRequest("Param id cannot be empty!");
             return;

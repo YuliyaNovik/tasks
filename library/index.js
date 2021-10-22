@@ -3,7 +3,7 @@ const { getBookRouter } = require("./src/routes/book.router");
 const { getAuthorRouter } = require("./src/routes/author.router");
 const { getFineRouter } = require("./src/routes/fine.router");
 const { getUserRouter } = require("./src/routes/user.router");
-const { HttpStatusCode } = require("./src/utils/httpStatusCode");
+const { getUserFineRouter } = require("./src/routes/userFine.router");
 
 const hostName = "127.0.0.1";
 const PORT = process.env.PORT || 3000;
@@ -31,6 +31,7 @@ const main = async () => {
     server.use("/fines", fineRouter);
     server.use("/users/:userId/fines", userRouter);
     server.use("/fines/:fineId/users", fineRouter);
+    server.use("/user-fine", getUserFineRouter())
 };
 
 main();

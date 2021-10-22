@@ -53,8 +53,8 @@ class UserController {
         }
 
         try {
-            const resource = await UserFine.getByUserIdAndFineId(request.params.userId, request.params.id);
-            response.ok(JSON.stringify(resource));
+            const resources = await UserFine.getByUserIdAndFineId(request.params.userId, request.params.id);
+            response.ok(JSON.stringify(resources));
         } catch (error) {
             if (error.reason === "not_found") {
                 response.notFound(`No user fine with userId ${request.params.userId} and fineId ${request.params.id}.`);
