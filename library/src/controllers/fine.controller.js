@@ -1,29 +1,8 @@
 const Fine = require("../models/fine");
-const { HttpStatusCode } = require("../utils/httpStatusCode");
 const UserFine = require("../models/userFine");
 const { getLocationValue } = require("../utils/location");
 
 class FineController {
-    async createUserFine(request, response) {
-        if (!request.params.fineId || !request.params.id) {
-            response.badRequest("Params fineId and id cannot be empty!");
-            return;
-        }
-
-        const userFine = {
-            userId: request.params.id,
-            fineId: request.body.fineId,
-            startDateTime: request.body.startDateTime,
-        };
-
-        try {
-            const resource = await UserFine.create(userFine);
-            response.created(getLocationValue(request.url, resource.id), JSON.stringify(resource));
-        } catch (error) {
-            response.internalServerError(error.message || "Some error occurred on creating the user.");
-        }
-    }
-
     async deleteUserFine(request, response) {
         if (!request.params.fineId || !request.params.id) {
             response.badRequest("Params fineId and id cannot be empty!");
@@ -39,20 +18,6 @@ class FineController {
     }
 
     async getAllUserFines(request, response) {
-        if (!request.params.fineId) {
-            response.badRequest("Param fineId cannot be empty!");
-            return;
-        }
-
-        try {
-            const resources = await UserFine.getAllByFineId(request.params.fineId);
-            response.ok(JSON.stringify(resources));
-        } catch (error) {
-            response.internalServerError(`Cannot retrieve user fines with fineId ${request.params.fineId}`);
-        }
-    }
-
-    async getUserFine(request, response) {
         if (!request.params.fineId || !request.params.id) {
             response.badRequest("Params fineId and id cannot be empty!");
             return;

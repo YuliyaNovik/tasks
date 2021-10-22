@@ -10,16 +10,8 @@ const getFineRouter = () => {
 };
 
 const addNestedFines = (router, controller) => {
-    router.get(`/${router.resourceKey}/:fineId/users`, async (request, response) => {
-        await controller.getAllUserFines(request, response);
-    });
-
-    router.post(`/${router.resourceKey}/:fineId/users`, async (request, response) => {
-        await controller.createUserFine(request, response);
-    });
-
     router.get(`/${router.resourceKey}/:fineId/users/:id`, async (request, response) => {
-        await controller.getUserFine(request, response);
+        await controller.getAllUserFines(request, response);
     });
 
     router.delete(`/${router.resourceKey}/:fineId/users/:id`, async (request, response) => {
