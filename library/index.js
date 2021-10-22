@@ -31,7 +31,7 @@ const main = async () => {
     server.use("/fines", fineRouter);
     server.use("/users/:userId/fines", userRouter);
     server.use("/fines/:fineId/users", fineRouter);
-    server.use("/user-fine", getUserFineRouter())
+    server.use("/activeFines", getUserFineRouter())
 };
 
 main();
