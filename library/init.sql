@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS book_genre(id int AUTO_INCREMENT NOT NULL, book_id in
 
 CREATE TABLE IF NOT EXISTS role(id int AUTO_INCREMENT NOT NULL, name VARCHAR(64), PRIMARY KEY(id));
 
-CREATE TABLE IF NOT EXISTS user(id int AUTO_INCREMENT NOT NULL, role_id int NOT NULL, first_name NVARCHAR(256), last_name NVARCHAR(256), address NVARCHAR(256), PRIMARY KEY(id), FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE CASCADE ON UPDATE CASCADE);
+CREATE TABLE IF NOT EXISTS user(id int AUTO_INCREMENT NOT NULL, email NVARCHAR(128) UNIQUE, role_id int NOT NULL, first_name NVARCHAR(256), last_name NVARCHAR(256), address NVARCHAR(256), password_hash VARCHAR(512), password_salt VARCHAR(128), PRIMARY KEY(id), FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE CASCADE ON UPDATE CASCADE);
 
 CREATE TABLE IF NOT EXISTS copy_user(id int AUTO_INCREMENT NOT NULL, copy_id int UNIQUE NOT NULL, user_id int NOT NULL, start_date_time datetime, PRIMARY KEY(id), FOREIGN KEY (copy_id) REFERENCES copy(id) ON DELETE CASCADE ON UPDATE CASCADE, FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE);
 
@@ -52,7 +52,5 @@ INSERT INTO librarydb.book (author_id, name, language_id, annotation, original_i
 INSERT INTO librarydb.copy (book_id) VALUES (1), (1), (1), (2), (2), (2), (2), (3);
 
 INSERT INTO librarydb.role (name) VALUES ('admin'), ('follower');
-INSERT INTO librarydb.user (first_name, last_name, address, role_id) VALUES ('FirstName', 'LastName', 'Minsk, vulica Fabrycyjusa, 8B', 1);
-INSERT INTO librarydb.user (first_name, last_name, address, role_id) VALUES ('Follower', 'Smith', 'Minsk, vulica Fabrycyjusa, 8B', 2);
 
 INSERT INTO librarydb.fine (period) VALUES (20);

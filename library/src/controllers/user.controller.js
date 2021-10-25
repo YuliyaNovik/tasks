@@ -1,20 +1,80 @@
 const User = require("../models/user");
 const UserFine = require("../models/userFine");
 const { getLocationValue } = require("../utils/location");
+const { jwt, createSalt, createHash, compare } = require("../utils/auth");
 
 class UserController {
-    async create(request, response) {
-        const user = {
-            firstName: request.body.firstName,
-            lastName: request.body.lastName,
-            address: request.body.address,
-        };
-
+    async register(request, response) {
         try {
+            const { firstName, lastName, address, password, email } = request.body;
+
+            if (!(email && password && firstName && lastName && address)) {
+                return response.badRequest("Email, password, first name, last name, and address are required");
+            }
+
+            if (await this.userExists(email)) {
+                return response.statusCode(422).end("User already exists");
+            }
+
+            const salt = await createSalt();
+            const encryptedPassword = await createHash(password, salt);
+
+            const user = {
+                firstName,
+                lastName,
+                address,
+                email: email.toLowerCase(),
+                password: encryptedPassword,
+                salt,
+                role: "follower"
+            };
+
             const resource = await User.create(user);
-            response.created(getLocationValue(request.url, resource.id), JSON.stringify(resource));
+
+            resource.token = await jwt.sign({ user_id: resource.id, email }, {
+                expiresIn: "1h",
+            });
+
+            return response.created(getLocationValue(request.url, resource.id), JSON.stringify(resource));
         } catch (error) {
-            response.internalServerError(error.message || "Some error occurred on creating the user.");
+            return response.internalServerError(error.message || "Some error occurred on creating the user.");
+        }
+    }
+
+    async login(request, response) {
+        try {
+            const { email, password } = request.body;
+
+            if (!(email && password)) {
+                response.badRequest("Email and password are required");
+                return;
+            }
+
+            const user = await User.getByEmail(email.toLowerCase());
+
+            if (user && (await compare(password, user.password))) {
+                user.token = await jwt.sign({ user_id: user.id, email }, {
+                    expiresIn: "1h",
+                });
+
+                return response.ok(JSON.stringify(user));
+            }
+            return response.badRequest("Credentials are invalid");
+        } catch (error) {
+            return response.internalServerError(error.message || "Some error occurred on login.");
+        }
+    }
+
+    async create(request, response) {
+        return this.register(request, response);
+    }
+
+    async userExists(email) {
+        try {
+            await User.getByEmail(email);
+            return true;
+        } catch (e) {
+            return false;
         }
     }
 
@@ -57,7 +117,9 @@ class UserController {
             response.ok(JSON.stringify(resources));
         } catch (error) {
             if (error.reason === "not_found") {
-                response.notFound(`No active fines with userId ${request.params.userId} and fineId ${request.params.id}.`);
+                response.notFound(
+                    `No active fines with userId ${request.params.userId} and fineId ${request.params.id}.`
+                );
             } else {
                 response.internalServerError(
                     `Cannot retrieve active fine with userId ${request.params.userId} and fineId ${request.params.id}.`
