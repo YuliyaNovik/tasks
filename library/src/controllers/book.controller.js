@@ -10,9 +10,9 @@ class BookController {
 
         try {
             const resource = await Book.create(book);
-            response.created(getLocationValue(request.url, resource.id), JSON.stringify(resource));
+            return response.created(getLocationValue(request.url, resource.id), JSON.stringify(resource));
         } catch (error) {
-            response.internalServerError(error.message || "Some error occurred on creating the book.");
+            return response.internalServerError(error.message || "Some error occurred on creating the book.");
         }
     }
 
@@ -21,25 +21,24 @@ class BookController {
     async getAll(request, response) {
         try {
             const resources = await Book.getAll();
-            response.ok(JSON.stringify(resources));
+            return response.ok(JSON.stringify(resources));
         } catch (error) {
-            response.internalServerError(error.message || "Some error occurred on retrieving books.");
+            return response.internalServerError(error.message || "Some error occurred on retrieving books.");
         }
     }
 
     async get(request, response) {
         if (!request.params.id) {
-            response.badRequest("Param id cannot be empty!");
-            return;
+            return response.badRequest("Param id cannot be empty!");
         }
         try {
             const resource = await Book.getById(request.params.id);
-            response.ok(JSON.stringify(resource));
+            return response.ok(JSON.stringify(resource));
         } catch (error) {
             if (error.reason === "not_found") {
-                response.notFound(`No book with id ${request.params.id}.`);
+                return response.notFound(`No book with id ${request.params.id}.`);
             } else {
-                response.internalServerError("Error retrieving book with id " + request.params.id);
+                return response.internalServerError("Error retrieving book with id " + request.params.id);
             }
         }
     }

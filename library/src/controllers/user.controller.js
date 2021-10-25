@@ -46,8 +46,7 @@ class UserController {
             const { email, password } = request.body;
 
             if (!(email && password)) {
-                response.badRequest("Email and password are required");
-                return;
+                return response.badRequest("Email and password are required");
             }
 
             const user = await User.getByEmail(email.toLowerCase());
@@ -83,45 +82,43 @@ class UserController {
     async getAll(request, response) {
         try {
             const resources = await User.getAll();
-            response.ok(JSON.stringify(resources));
+            return response.ok(JSON.stringify(resources));
         } catch (error) {
-            response.internalServerError(error.message || "Some error occurred on retrieving users.");
+            return response.internalServerError(error.message || "Some error occurred on retrieving users.");
         }
     }
 
     async get(request, response) {
         if (!request.params.id) {
-            response.badRequest("Param id cannot be empty!");
-            return;
+            return response.badRequest("Param id cannot be empty!");
         }
         try {
             const resource = await User.getById(request.params.id);
-            response.ok(JSON.stringify(resource));
+            return response.ok(JSON.stringify(resource));
         } catch (error) {
             if (error.reason === "not_found") {
-                response.notFound(`No user with id ${request.params.id}.`);
+                return response.notFound(`No user with id ${request.params.id}.`);
             } else {
-                response.internalServerError("Error retrieving user with id " + request.params.id);
+                return response.internalServerError("Error retrieving user with id " + request.params.id);
             }
         }
     }
 
     async getAllUserFines(request, response) {
         if (!request.params.userId || !request.params.id) {
-            response.badRequest("Params userId and id cannot be empty!");
-            return;
+            return response.badRequest("Params userId and id cannot be empty!");
         }
 
         try {
             const resources = await UserFine.getByUserIdAndFineId(request.params.userId, request.params.id);
-            response.ok(JSON.stringify(resources));
+            return response.ok(JSON.stringify(resources));
         } catch (error) {
             if (error.reason === "not_found") {
-                response.notFound(
+                return response.notFound(
                     `No active fines with userId ${request.params.userId} and fineId ${request.params.id}.`
                 );
             } else {
-                response.internalServerError(
+                return response.internalServerError(
                     `Cannot retrieve active fine with userId ${request.params.userId} and fineId ${request.params.id}.`
                 );
             }

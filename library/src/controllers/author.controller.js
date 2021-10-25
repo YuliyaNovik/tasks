@@ -11,21 +11,21 @@ class AuthorController {
 
         try {
             const resource = await Author.create(author);
-            response.created(getLocationValue(request.url, resource.id), JSON.stringify(resource));
+            return response.created(getLocationValue(request.url, resource.id), JSON.stringify(resource));
         } catch (error) {
-            response.internalServerError(error.message || "Some error occurred on creating the author.");
+            return response.internalServerError(error.message || "Some error occurred on creating the author.");
         }
     }
 
     async deleteById(request, response) {
         if (!request.params.id) {
-            response.badRequest("Param id cannot be empty!");
+            return response.badRequest("Param id cannot be empty!");
         }
         try {
             await Author.deleteById(request.params.id);
-            response.ok();
+            return response.ok();
         } catch (error) {
-            response.internalServerError(
+            return response.internalServerError(
                 error.message || `Some error occurred on deleting author with id ${request.params.id}.`
             );
         }
@@ -42,17 +42,16 @@ class AuthorController {
 
     async get(request, response) {
         if (!request.params.id) {
-            response.badRequest("Param id cannot be empty!");
-            return;
+            return response.badRequest("Param id cannot be empty!");
         }
         try {
             const resource = await Author.getById(request.params.id);
             response.ok(JSON.stringify(resource));
         } catch (error) {
             if (error.reason === "not_found") {
-                response.notFound(`No author with id ${request.params.id}.`);
+                return response.notFound(`No author with id ${request.params.id}.`);
             } else {
-                response.internalServerError("Error retrieving author with id " + request.params.id);
+                return response.internalServerError("Error retrieving author with id " + request.params.id);
             }
         }
     }

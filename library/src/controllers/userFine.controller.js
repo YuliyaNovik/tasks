@@ -4,8 +4,7 @@ const { getLocationValue } = require("../utils/location");
 class UserFineController {
     async create(request, response) {
         if (!request.body.fineId || !request.body.userId) {
-            response.badRequest("Body fields fineId and userId cannot be empty!");
-            return;
+            return response.badRequest("Body fields fineId and userId cannot be empty!");
         }
 
         const userFine = {
@@ -16,49 +15,47 @@ class UserFineController {
 
         try {
             const resource = await UserFine.create(userFine);
-            response.created(getLocationValue(request.url, resource.id), JSON.stringify(resource));
+            return response.created(getLocationValue(request.url, resource.id), JSON.stringify(resource));
         } catch (error) {
-            response.internalServerError(error.message || "Some error occurred on creating the user.");
+            return response.internalServerError(error.message || "Some error occurred on creating the user.");
         }
     }
 
     async deleteById(request, response) {
         if (!request.params.id) {
-            response.badRequest("Param id cannot be empty!");
-            return;
+            return response.badRequest("Param id cannot be empty!");
         }
 
         try {
             await UserFine.deleteById(request.params.id);
-            response.ok();
+            return response.ok();
         } catch (error) {
-            response.internalServerError(error.message || "Some error occurred on creating the user.");
+            return response.internalServerError(error.message || "Some error occurred on creating the user.");
         }
     }
 
     async getAll(request, response) {
         try {
             const resources = await UserFine.getAll();
-            response.ok(JSON.stringify(resources));
+            return response.ok(JSON.stringify(resources));
         } catch (error) {
-            response.internalServerError(`Cannot retrieve active fines with fineId ${request.params.fineId}`);
+            return response.internalServerError(`Cannot retrieve active fines with fineId ${request.params.fineId}`);
         }
     }
 
     async get(request, response) {
         if (!request.params.id) {
-            response.badRequest("Param id cannot be empty!");
-            return;
+            return response.badRequest("Param id cannot be empty!");
         }
 
         try {
             const resource = await UserFine.getById(request.params.id);
-            response.ok(JSON.stringify(resource));
+            return response.ok(JSON.stringify(resource));
         } catch (error) {
             if (error.reason === "not_found") {
-                response.notFound(`No active fine with id ${request.params.id}`);
+                return response.notFound(`No active fine with id ${request.params.id}`);
             } else {
-                response.internalServerError(`Cannot retrieve active fine with id ${request.params.id}`);
+                return response.internalServerError(`Cannot retrieve active fine with id ${request.params.id}`);
             }
         }
     }
