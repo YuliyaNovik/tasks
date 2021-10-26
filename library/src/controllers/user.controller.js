@@ -2,25 +2,11 @@ const User = require("../models/user");
 const Token = require("../models/token");
 const UserFine = require("../models/userFine");
 const { getLocationValue } = require("../utils/location");
-const { jwt, createSalt, createHash, compare } = require("../utils/auth");
+const { createSalt, createHash } = require("../utils/auth");
+const UserService = require("../services/user.service");
+const Fine = require("../models/fine");
 
 class UserController {
-
-    constructor () {
-        this.DEFAULT_ROLE = "follower";
-    }
-
-    getResource(user) {
-        return {
-            id: user.id,
-            email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            address: user.address,
-            role: user.role,
-        };
-    }
-
     async create(request, response) {
         try {
             const { firstName, lastName, address, email } = request.body;
@@ -29,7 +15,7 @@ class UserController {
                 return response.badRequest("Email, first name, last name, and address are required");
             }
 
-            if (await this.userExists(email)) {
+            if (await UserService.userExists(email)) {
                 return response.statusCode(422).end("User already exists");
             }
 
@@ -38,10 +24,10 @@ class UserController {
                 lastName,
                 address,
                 email: email.toLowerCase(),
-                role: this.DEFAULT_ROLE,
+                role: UserService.DEFAULT_ROLE,
             };
 
-            const resource = this.getResource(await User.create(user));
+            const resource = UserService.toResource(await User.create(user));
 
             const salt = await createSalt();
             // TODO: randomize
@@ -58,21 +44,24 @@ class UserController {
         }
     }
 
-    async userExists(email) {
+    async deleteById(request, response) {
+        if (!request.params.id) {
+            return response.badRequest("Param id cannot be empty!");
+        }
         try {
-            await User.getByEmail(email);
-            return true;
-        } catch (e) {
-            return false;
+            await User.deleteById(request.params.id);
+            return response.ok();
+        } catch (error) {
+            return response.internalServerError(
+                error.message || `Some error occurred on deleting user with id ${request.params.id}.`
+            );
         }
     }
-
-    async deleteById() {}
 
     async getAll(request, response) {
         try {
             const users = await User.getAll();
-            return response.ok(JSON.stringify(users.map(this.getResource)));
+            return response.ok(JSON.stringify(users.map(UserService.toResource)));
         } catch (error) {
             return response.internalServerError(error.message || "Some error occurred on retrieving users.");
         }
@@ -84,7 +73,7 @@ class UserController {
         }
         try {
             const user = await User.getById(request.params.id);
-            return response.ok(JSON.stringify(this.getResource(user)));
+            return response.ok(JSON.stringify(UserService.toResource(user)));
         } catch (error) {
             if (error.reason === "not_found") {
                 return response.notFound(`No user with id ${request.params.id}.`);

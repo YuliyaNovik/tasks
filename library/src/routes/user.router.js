@@ -10,18 +10,6 @@ const getUserRouter = () => {
 };
 
 const addNestedFines = (router, controller) => {
-    router.post(`/${router.resourceKey}/register`, async (request, response) => {
-        await controller.register(request, response);
-    });
-
-    router.post(`/${router.resourceKey}/login`, async (request, response) => {
-        await controller.login(request, response);
-    });
-
-    router.post(`/${router.resourceKey}/reset`, async (request, response) => {
-        await controller.resetPassword(request, response);
-    });
-
     router.get(`/${router.resourceKey}/:userId/fines/:id`, async (request, response) => {
         await controller.getAllUserFines(request, response);
     });
