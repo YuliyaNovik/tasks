@@ -2,37 +2,11 @@ const { RequestHandler } = require("../utils/requestHandler");
 const { SpecifiedError } = require("../utils/specifiedError");
 
 class Router extends RequestHandler {
-    constructor() {
+    constructor(resourceKey) {
         super();
         this.routes = [];
-        this.addMiddleware((request, response, next) => {
-            if (new RegExp(`^/${this.resourceKey}`).test(request.url)) {
-                next();
-            } else {
-                console.log(`URL ${request.url} isn't supported by ${this.resourceKey} resource router`);
-            }
-        });
-
-        this.addMiddleware((request, response, next) => {
-            try {
-                request.initParams();
-                next();
-            } catch (error) {
-                console.log(error);
-            }
-        });
-
-        this.addMiddleware((request, response, next) => {
-            if (request.method !== "POST") {
-                next();
-                return;
-            }
-            if (!request.body) {
-                response.badRequest("Body cannot be empty!");
-            } else {
-                next();
-            }
-        });
+        this.resourceKey = resourceKey;
+        this.initMiddlewares();
     }
 
     async navigate(templateUrl, request, response) {
@@ -83,47 +57,6 @@ class Router extends RequestHandler {
         return true;
     }
 
-    _route(method, url, callback) {
-        this.routes.push({
-            url,
-            callback,
-            method,
-        });
-    }
-
-    _findRoute(url, method) {
-        return this.routes.find((route) => this.compareURL(route.url, url) && route.method === method);
-    }
-}
-
-class ResourceRouter extends Router {
-    constructor(resourceKey, controller) {
-        super();
-        this.resourceKey = resourceKey;
-        this.initDefaultRoutes(controller);
-        this.initMiddlewares();
-    }
-
-    initDefaultRoutes(controller) {
-        this.get(`/${this.resourceKey}`, async (request, response) => {
-            await controller.getAll(request, response);
-        });
-
-        this.post(`/${this.resourceKey}`, async (request, response) => {
-            await controller.create(request, response);
-        });
-
-        this.get(`/${this.resourceKey}/:id`, async (request, response) => {
-            request.params.id = request.url.split(`/${this.resourceKey}/`)[1];
-            await controller.get(request, response);
-        });
-
-        this.delete(`/${this.resourceKey}/:id`, async (request, response) => {
-            request.params.id = request.url.split(`/${this.resourceKey}/`)[1];
-            await controller.deleteById(request, response);
-        });
-    }
-
     initMiddlewares() {
         this.addMiddleware((request, response, next) => {
             if (new RegExp(`^/${this.resourceKey}`).test(request.url)) {
@@ -152,6 +85,44 @@ class ResourceRouter extends Router {
             } else {
                 next();
             }
+        });
+    }
+
+    _route(method, url, callback) {
+        this.routes.push({
+            url,
+            callback,
+            method,
+        });
+    }
+
+    _findRoute(url, method) {
+        return this.routes.find((route) => this.compareURL(route.url, url) && route.method === method);
+    }
+}
+
+class ResourceRouter extends Router {
+    constructor(resourceKey, controller) {
+        super(resourceKey);
+        this.resourceKey = resourceKey;
+        this.initDefaultRoutes(controller);
+    }
+
+    initDefaultRoutes(controller) {
+        this.get(`/${this.resourceKey}`, async (request, response) => {
+            await controller.getAll(request, response);
+        });
+
+        this.post(`/${this.resourceKey}`, async (request, response) => {
+            await controller.create(request, response);
+        });
+
+        this.get(`/${this.resourceKey}/:id`, async (request, response) => {
+            await controller.get(request, response);
+        });
+
+        this.delete(`/${this.resourceKey}/:id`, async (request, response) => {
+            await controller.deleteById(request, response);
         });
     }
 }
