@@ -4,6 +4,7 @@ const { getAuthorRouter } = require("./src/routes/author.router");
 const { getFineRouter } = require("./src/routes/fine.router");
 const { getUserRouter } = require("./src/routes/user.router");
 const { getUserFineRouter } = require("./src/routes/userFine.router");
+const { getAuthRouter } = require("./src/routes/auth.router");
 
 const hostName = "127.0.0.1";
 const PORT = process.env.PORT || 3000;
@@ -23,6 +24,7 @@ const main = async () => {
             console.log(error);
         }
     });
+    server.use("/auth", getAuthRouter());
     server.use("/books", getBookRouter());
     server.use("/authors", getAuthorRouter());
     const userRouter = getUserRouter();

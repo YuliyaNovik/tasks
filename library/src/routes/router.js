@@ -5,6 +5,34 @@ class Router extends RequestHandler {
     constructor() {
         super();
         this.routes = [];
+        this.addMiddleware((request, response, next) => {
+            if (new RegExp(`^/${this.resourceKey}`).test(request.url)) {
+                next();
+            } else {
+                console.log(`URL ${request.url} isn't supported by ${this.resourceKey} resource router`);
+            }
+        });
+
+        this.addMiddleware((request, response, next) => {
+            try {
+                request.initParams();
+                next();
+            } catch (error) {
+                console.log(error);
+            }
+        });
+
+        this.addMiddleware((request, response, next) => {
+            if (request.method !== "POST") {
+                next();
+                return;
+            }
+            if (!request.body) {
+                response.badRequest("Body cannot be empty!");
+            } else {
+                next();
+            }
+        });
     }
 
     async navigate(templateUrl, request, response) {
@@ -23,6 +51,10 @@ class Router extends RequestHandler {
 
     get(url, callback) {
         this._route("GET", url, callback);
+    }
+
+    put(url, callback) {
+        this._route("PUT", url, callback);
     }
 
     post(url, callback) {
