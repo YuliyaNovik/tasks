@@ -27,8 +27,37 @@ const create = async (newUser) => {
         await connection.commit();
 
         const resource = { id: rows.insertId, ...newUser };
-        console.log("Created user: ", resource);
+        console.log("Created user: ", resource.id);
         return resource;
+    } catch (error) {
+        console.log("Error: ", error);
+        throw new SpecifiedError({ reason: "Error in sql query" });
+    }
+};
+
+const update = async (updatedUser) => {
+    try {
+        const connection = await connectionPromise;
+
+        await connection.beginTransaction();
+        const [roleRows, _] = await connection.query(`SELECT * FROM role WHERE role.name = '${updatedUser.role}';`);
+
+        const [rows, fields] = await connection.query(
+            `UPDATE user set email = ?, first_name = ?, last_name = ?, address = ?, role_id = ?, password_hash = ?, password_salt = ? WHERE id = ?`,
+            [
+                updatedUser.email,
+                updatedUser.firstName,
+                updatedUser.lastName,
+                updatedUser.address,
+                roleRows[0].id,
+                updatedUser.password,
+                updatedUser.salt,
+                updatedUser.id,
+            ]
+        );
+        await connection.commit();
+        return updatedUser;
+        console.log("Updated user: ", updatedUser.id);
     } catch (error) {
         console.log("Error: ", error);
         throw new SpecifiedError({ reason: "Error in sql query" });
@@ -55,7 +84,7 @@ const getById = async (id) => {
     if (!resource) {
         throw new SpecifiedError({ reason: "not_found" });
     }
-    console.log("Found user: ", resource);
+    console.log("Found user: ", resource.id);
     return resource;
 };
 
@@ -68,7 +97,7 @@ const getByEmail = async (email) => {
     if (!resource) {
         throw new SpecifiedError({ reason: "not_found" });
     }
-    console.log("Found user: ", resource);
+    console.log("Found user: ", resource.id);
     return resource;
 };
 
@@ -78,7 +107,10 @@ const getAll = async () => {
         const [rows, fields] = await connection.query(
             `SELECT u.id, u.email, u.first_name as firstName, u.last_name as lastName, u.address, u.password_hash as password, u.password_salt as salt, r.name as role FROM user u INNER JOIN role r on u.role_id = r.id ;`
         );
-        console.log("Found users: ", rows);
+        console.log(
+            "Found users: ",
+            rows.map((row) => row.id)
+        );
         return rows;
     } catch (error) {
         console.log("Error: ", error);
@@ -86,4 +118,4 @@ const getAll = async () => {
     }
 };
 
-module.exports = { create, getById, getAll, deleteById, getByEmail };
+module.exports = { create, getById, getAll, deleteById, getByEmail, update };

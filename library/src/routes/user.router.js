@@ -18,6 +18,10 @@ const addNestedFines = (router, controller) => {
         await controller.login(request, response);
     });
 
+    router.post(`/${router.resourceKey}/reset`, async (request, response) => {
+        await controller.resetPassword(request, response);
+    });
+
     router.get(`/${router.resourceKey}/:userId/fines/:id`, async (request, response) => {
         await controller.getAllUserFines(request, response);
     });

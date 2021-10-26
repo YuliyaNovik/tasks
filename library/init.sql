@@ -1,5 +1,5 @@
 DROP VIEW IF EXISTS book_view;
-DROP TABLE IF EXISTS copy_user, book_genre, user_fine, fine, user, role,
+DROP TABLE IF EXISTS token, copy_user, book_genre, user_fine, fine, user, role,
     copy, book, genre, author_name, author, language;
 
 CREATE TABLE IF NOT EXISTS language(id int AUTO_INCREMENT NOT NULL, lang_key VARCHAR(16) NOT NULL, name NVARCHAR(64) NOT NULL, PRIMARY KEY(id));
@@ -25,6 +25,8 @@ CREATE TABLE IF NOT EXISTS copy_user(id int AUTO_INCREMENT NOT NULL, copy_id int
 CREATE TABLE IF NOT EXISTS fine(id int AUTO_INCREMENT NOT NULL, period int NOT NULL, PRIMARY KEY(id));
 
 CREATE TABLE IF NOT EXISTS user_fine(id int AUTO_INCREMENT NOT NULL, fine_id int NOT NULL, user_id int NOT NULL, start_date_time datetime, PRIMARY KEY(id), FOREIGN KEY (fine_id) REFERENCES fine(id) ON DELETE CASCADE ON UPDATE CASCADE, FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE);
+
+CREATE TABLE IF NOT EXISTS token(id int AUTO_INCREMENT NOT NULL, user_id int UNIQUE NOT NULL, value VARCHAR(512) UNIQUE NOT NULL, PRIMARY KEY(id), FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE);
 
 CREATE VIEW book_view AS
   SELECT
