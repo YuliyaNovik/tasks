@@ -1,8 +1,7 @@
 const User = require("../models/user");
-const Token = require("../models/token");
+const TokenService = require("../services/token.service");
 const UserFine = require("../models/userFine");
 const { getLocationValue } = require("../utils/location");
-const { encrypt } = require("../utils/crypt");
 const UserService = require("../services/user.service");
 const MailSender = require("../utils/mailSender");
 const { LinkToResetLetter } = require("../utils/mail");
@@ -30,15 +29,10 @@ class UserController {
 
             const resource = UserService.toResource(await User.create(user));
 
-            // TODO: randomize
-            const resetToken = "reset token";
-            const token = await encrypt(resetToken);
+            const token = TokenService.getActiveToken(resource.id);
 
             // TODO: add link
             await MailSender.send(new LinkToResetLetter(resource, ""));
-
-            console.log("Token: " + resetToken);
-            await Token.create({ userId: resource.id, token });
 
             return response.created(getLocationValue(request.url, resource.id), JSON.stringify(resource));
         } catch (error) {
