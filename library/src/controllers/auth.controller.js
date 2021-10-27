@@ -3,6 +3,7 @@ const Token = require("../models/token");
 const { getLocationValue } = require("../utils/location");
 const { jwt, createSalt, createHash, compare } = require("../utils/auth");
 const UserService = require("../services/user.service");
+const MailSender = require("../utils/mailSender");
 
 class AuthController {
     async register(request, response) {
@@ -65,7 +66,7 @@ class AuthController {
 
             let passwordResetToken = await Token.getByUserId(userId);
 
-            if (!await compare(token, passwordResetToken.value)) {
+            if (!passwordResetToken || !await compare(token, passwordResetToken.value)) {
                 return response.badRequest("Invalid or expired password reset token");
             }
 
@@ -73,7 +74,7 @@ class AuthController {
             user.password = await createHash(password, await createSalt());
 
             const resource = UserService.toResource(await User.update(user));
-            // sendEmail();
+            await MailSender.sendSuccessfulReset(resource);
             await Token.deleteByTokenValue(token);
             return response.ok(JSON.stringify(resource));
         } catch (error) {

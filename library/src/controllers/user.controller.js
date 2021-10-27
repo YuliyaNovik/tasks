@@ -4,7 +4,7 @@ const UserFine = require("../models/userFine");
 const { getLocationValue } = require("../utils/location");
 const { createSalt, createHash } = require("../utils/auth");
 const UserService = require("../services/user.service");
-const Fine = require("../models/fine");
+const MailSender = require("../utils/mailSender");
 
 class UserController {
     async create(request, response) {
@@ -34,7 +34,9 @@ class UserController {
             const resetToken = "reset token";
             const token = await createHash(resetToken, salt);
 
-            //sendEmail
+            const link = "";
+            await MailSender.sendLinkToReset(resource, link);
+
             console.log("Token: " + resetToken);
             await Token.create({ userId: resource.id, token });
 

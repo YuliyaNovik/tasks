@@ -12,6 +12,7 @@
   "dependencies": {
     "bcrypt": "^5.0.1",
     "mysql2": "^2.3.0",
-    "node-jsonwebtoken": "^0.0.1"
+    "node-jsonwebtoken": "^0.0.1",
+    "nodemailer": "^6.7.0"
   }
 }
