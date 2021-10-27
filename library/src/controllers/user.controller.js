@@ -2,7 +2,7 @@ const User = require("../models/user");
 const Token = require("../models/token");
 const UserFine = require("../models/userFine");
 const { getLocationValue } = require("../utils/location");
-const { createSalt, createHash } = require("../utils/auth");
+const { encrypt } = require("../utils/crypt");
 const UserService = require("../services/user.service");
 const MailSender = require("../utils/mailSender");
 const { LinkToResetLetter } = require("../utils/mail");
@@ -30,10 +30,9 @@ class UserController {
 
             const resource = UserService.toResource(await User.create(user));
 
-            const salt = await createSalt();
             // TODO: randomize
             const resetToken = "reset token";
-            const token = await createHash(resetToken, salt);
+            const token = await encrypt(resetToken);
 
             // TODO: add link
             await MailSender.send(new LinkToResetLetter(resource, ""));

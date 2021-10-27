@@ -20,6 +20,6 @@ const toResource = (user) => {
         address: user.address,
         role: user.role,
     };
-}
+};
 
 module.exports = { DEFAULT_ROLE, userExists, toResource };

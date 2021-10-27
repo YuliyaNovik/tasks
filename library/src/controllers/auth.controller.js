@@ -1,7 +1,8 @@
 const User = require("../models/user");
 const Token = require("../models/token");
 const { getLocationValue } = require("../utils/location");
-const { jwt, createSalt, createHash, compare } = require("../utils/auth");
+const { jwt } = require("../utils/auth");
+const { encrypt, compare } = require("../utils/crypt");
 const UserService = require("../services/user.service");
 const MailSender = require("../utils/mailSender");
 const { SuccessfulResetLetter } = require("../utils/mail");
@@ -19,7 +20,7 @@ class AuthController {
                 return response.statusCode(422).end("User already exists");
             }
 
-            const encryptedPassword = await createHash(password, await createSalt());
+            const encryptedPassword = await encrypt(password);
 
             const user = {
                 firstName,
@@ -72,7 +73,7 @@ class AuthController {
             }
 
             const user = await User.getById(userId);
-            user.password = await createHash(password, await createSalt());
+            user.password = await encrypt(password);
 
             const resource = UserService.toResource(await User.update(user));
             // TODO: add link
