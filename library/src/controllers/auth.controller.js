@@ -32,7 +32,7 @@ class AuthController {
             };
 
             const resource = UserService.toResource(await User.create(user));
-            resource.token = await this.createUserJWT(user);
+            resource.token = await this.createUserJWT(resource);
 
             return response.created(getLocationValue(request.url, resource.id), JSON.stringify(resource));
         } catch (error) {
@@ -52,7 +52,7 @@ class AuthController {
 
             if (user && (await compare(password, user.password))) {
                 const resource = UserService.toResource(user);
-                resource.token = await this.createUserJWT(user);
+                resource.token = await this.createUserJWT(resource);
                 return response.ok(JSON.stringify(resource));
             }
 
