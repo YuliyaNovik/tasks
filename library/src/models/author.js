@@ -74,4 +74,7 @@ const getAll = async () => {
     }
 };
 
-module.exports = { getById, getAll, create, deleteById };
+const getByFilter = async (filter) => {
+};
+
+module.exports = { getById, getAll, create, deleteById, getByFilter };
