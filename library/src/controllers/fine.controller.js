@@ -8,6 +8,10 @@ class FineController {
             period: request.body.period,
         };
 
+        if (!fine.period) {
+            return response.badRequest("Period is required");
+        }
+
         try {
             const resource = await Fine.create(fine);
             return response.created(getLocationValue(request.url, resource.id), JSON.stringify(resource));

@@ -9,6 +9,10 @@ class AuthorController {
             languageId: request.body.languageId,
         };
 
+        if (!(author.name && author.country && author.languageId)) {
+            return response.badRequest("Name, country, and languageId are required");
+        }
+
         try {
             const resource = await Author.create(author);
             return response.created(getLocationValue(request.url, resource.id), JSON.stringify(resource));
