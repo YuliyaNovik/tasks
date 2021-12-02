@@ -1,5 +1,6 @@
 const Author = require("../models/author");
 const { getLocationValue } = require("../utils/location");
+const AuthorService = require("../services/author.service");
 
 class AuthorController {
     async create(request, response) {
@@ -11,6 +12,10 @@ class AuthorController {
 
         if (!(author.name && author.country && author.languageId)) {
             return response.badRequest("Name, country, and languageId are required");
+        }
+
+        if (await AuthorService.exists(author)) {
+            return response.statusCode(422).end("Author already exists");
         }
 
         try {

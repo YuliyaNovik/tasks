@@ -3,6 +3,9 @@ const { AuthorController } = require("../../../src/controllers/author.controller
 jest.mock("../../../src/models/author");
 const Author = require("../../../src/models/author");
 
+jest.mock("../../../src/services/author.service");
+const AuthorService = require("../../../src/services/author.service");
+
 const mockCreate = (author, id) => {
     Author.create.mockImplementationOnce(async () => {
         return {
@@ -24,6 +27,10 @@ const mockGetAll = (authors) => {
 
 const mockDeleteById = () => {
     Author.deleteById.mockImplementationOnce(async () => {});
+};
+
+const mockExists = (exists) => {
+    AuthorService.exists.mockImplementationOnce(async () => exists);
 };
 
 const mockRequest = (request) => {
@@ -54,7 +61,7 @@ describe("it should check author controller", () => {
             const authorMock = {
                 name: "Name",
                 country: "USA",
-                languageId: 1
+                languageId: 1,
             };
             mockCreate(authorMock, 1);
             const controller = new AuthorController();
@@ -69,8 +76,25 @@ describe("it should check author controller", () => {
                 id: 1,
                 name: "Name",
                 country: "USA",
-                languageId: 1
+                languageId: 1,
             });
+        });
+
+        it("it should check author existence", async () => {
+            const authorMock = {
+                name: "Name",
+                country: "USA",
+                languageId: 1,
+            };
+            mockExists(true);
+            const controller = new AuthorController();
+            const request = mockRequest({ body: authorMock });
+            const response = mockResponse();
+
+            await controller.create(request, response);
+
+            expect(response.statusCode).toHaveBeenCalledWith(422);
+            expect(response.end).toHaveBeenCalledWith("Author already exists");
         });
 
         it("it should check body fields before creation", async () => {
@@ -90,7 +114,7 @@ describe("it should check author controller", () => {
                 id: 1,
                 name: "Name",
                 country: "USA",
-                languageId: 1
+                languageId: 1,
             };
             mockGetById(authorMock);
             const controller = new AuthorController();
@@ -107,7 +131,7 @@ describe("it should check author controller", () => {
             const authorMock = {
                 name: "Name",
                 country: "USA",
-                languageId: 1
+                languageId: 1,
             };
             mockGetById(authorMock);
             const controller = new AuthorController();
@@ -126,7 +150,7 @@ describe("it should check author controller", () => {
                 {
                     name: "Name",
                     country: "USA",
-                    languageId: 1
+                    languageId: 1,
                 },
             ];
             mockGetAll(authorsMock);
