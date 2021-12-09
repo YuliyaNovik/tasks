@@ -1,11 +1,13 @@
 const { ResourceRouter } = require("./router");
 const { UserController } = require("../controllers/user.controller");
+const { verifyToken } = require("../utils/auth");
 
 const getUserRouter = () => {
     const resourceKey = "users";
     const controller = new UserController();
     const router = new ResourceRouter(resourceKey, controller);
     addNestedFines(router, controller);
+    router.addMiddleware(verifyToken);
     return router;
 };
 

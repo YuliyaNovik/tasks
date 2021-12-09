@@ -12,6 +12,10 @@ class Request {
         return this._request.method;
     }
 
+    get headers() {
+        return this._request.headers;
+    }
+
     get body() {
         return this._body;
     }

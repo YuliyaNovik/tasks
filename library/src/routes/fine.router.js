@@ -1,11 +1,13 @@
 const { ResourceRouter } = require("./router");
 const { FineController } = require("../controllers/fine.controller");
+const { verifyToken } = require("../utils/auth");
 
 const getFineRouter = () => {
     const resourceKey = "fines";
     const controller = new FineController();
     const router = new ResourceRouter(resourceKey, controller);
     addNestedFines(router, controller);
+    router.addMiddleware(verifyToken);
     return router;
 };
 
