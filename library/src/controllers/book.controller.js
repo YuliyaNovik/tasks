@@ -16,7 +16,19 @@ class BookController {
         }
     }
 
-    async deleteById() {}
+    async deleteById(request, response) {
+        if (!request.params.id) {
+            return response.badRequest("Param id cannot be empty!");
+        }
+        try {
+            await Book.deleteById(request.params.id);
+            return response.ok();
+        } catch (error) {
+            return response.internalServerError(
+                error.message || `Some error occurred on deleting fine with id ${request.params.id}.`
+            );
+        }
+    }
 
     async getAll(request, response) {
         try {
