@@ -2,10 +2,17 @@ const { encrypt, compare} = require("../utils/crypt");
 const Token = require("../models/token");
 
 const getActiveToken = async (userId) => {
-    // TODO: randomize
-    const value = "reset token";
-    console.log("Token: " + value);
-    return await createToken(userId, value);
+    try {
+        return await Token.getByUserId(userId);
+    } catch (error) {
+        if (error.reason === "not_found") {
+            const value = "reset token";
+            console.log("Token: " + value);
+            return await createToken(userId, value);
+        } else {
+            throw error;
+        }
+    }
 };
 
 const createToken = async (userId, value) => {
